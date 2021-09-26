@@ -24,9 +24,9 @@ namespace SeaBattle
             //Console.WriteLine("Max Health " + SmallShip<Battle>.healthMax);
             //Console.WriteLine("Max HealthMax  " + battleBigShip1.HealthMax);
 
-            if (battleSmallShip1.Ability is IBattle)
+            if (battleSmallShip1.Ability is IBattle battle)
             {
-                battleSmallShip1.Shoot(new Coordinate(1, 2, 4));
+                 battle.Shoot(new Coordinate(1, 2, 4));
             }
 
 

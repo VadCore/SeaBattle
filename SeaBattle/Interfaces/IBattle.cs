@@ -6,6 +6,6 @@ namespace SeaBattle.Interfaces
 {
     public interface IBattle : IAbility
     {
-        public bool Shoot(IShip targetShip, int damageShot);
+        public bool Shoot(Coordinate coordinate);
     }
 }

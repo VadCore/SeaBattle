@@ -6,6 +6,6 @@ namespace SeaBattle.Interfaces
 {
     public interface ISupport : IAbility
     {
-        public bool Repair(IShip targetShip, int healShot);
+        public bool Repair(Coordinate coordinate);
     }
 }

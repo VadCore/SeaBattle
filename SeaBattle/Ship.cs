@@ -49,13 +49,6 @@ namespace SeaBattle
             return targetShip;
         }
 
-        public bool Shoot(Coordinate coordinate)
-        {
-            var targetShip = GetTargetShip(coordinate);
-
-            return ((IBattle)Ability).Shoot(targetShip, DamageShot);
-        }
-
         public void Damage(int damage)
         {
             Health -= damage;
@@ -66,13 +59,6 @@ namespace SeaBattle
                 Console.WriteLine("Sunk");
                 Dislocate();
             }
-        }
-
-        public bool Repair(Coordinate coordinate)
-        {
-            var targetShip = GetTargetShip(coordinate);
-
-            return ((ISupport)Ability).Repair(targetShip, HealShot);
         }
 
         public void Heal(int healShot)
