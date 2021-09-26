@@ -5,76 +5,51 @@ using System.Text;
 
 namespace SeaBattle
 {
-    public class Coordinate
+    public struct Coordinate
     {
-        private int xAbs;
-        private int quadrant;
-        private int yAbs;
-        public int Quadrant
-        {
-            get => quadrant;
-            private set => quadrant = value.ExceptionIfNotBetweenMinMax(0, 3); // In range of four quadrants
-        }
-        public int XAbs
-        {
-            get => xAbs;
-            set
-            {
-                if (Quadrant % 2 == 1 && value < 0)
-                {
-                    Quadrant--;
-                    value *= -1;
-                }
-                else if (Quadrant % 2 == 0 && value <= 0)
-                {
-                    Quadrant++;
-                    value *= -1;
-                }
-
-                xAbs = value.ExceptionIfNotBetweenMinMax(0, Game.Board.XAbsMax);
-            }
-        }
-        public int YAbs
-        {
-            get => yAbs;
-            set
-            {
-                if (Quadrant / 2 == 0 && value < 0)
-                {
-                    Quadrant += 2;
-                    value *= -1;
-                }
-                else if (Quadrant / 2 == 1 && value <= 0)
-                {
-                    Quadrant -= 2;
-                    value *= -1;
-                }
-
-                yAbs = value.ExceptionIfNotBetweenMinMax(0, Game.Board.YAbsMax);
-            }
-        }
+        public int Quadrant{ get; }
+        public int XAbs{ get; }
+        public int YAbs{ get; }
 
         public Coordinate(int quadrant, int xAbs, int yAbs)
         {
-            Quadrant = quadrant;
-            XAbs = xAbs;
-            YAbs = yAbs;
+            Quadrant = quadrant.ExceptionIfNotBetweenMinMax(0, 3);
+
+            if (Quadrant % 2 == 1 && xAbs < 0)
+            {
+                Quadrant--;
+                xAbs *= -1;
+            }
+            else if (Quadrant % 2 == 0 && xAbs <= 0)
+            {
+                Quadrant++;
+                xAbs *= -1;
+            }
+
+            XAbs = xAbs.ExceptionIfNotBetweenMinMax(0, Game.Board.XAbsMax);
+
+            if (Quadrant / 2 == 0 && yAbs < 0)
+            {
+                Quadrant += 2;
+                yAbs *= -1;
+            }
+            else if (Quadrant / 2 == 1 && yAbs <= 0)
+            {
+                Quadrant -= 2;
+                yAbs *= -1;
+            }
+
+            YAbs = yAbs.ExceptionIfNotBetweenMinMax(0, Game.Board.YAbsMax);
         }
 
         public static Coordinate operator +(Coordinate coordinate, Vector2D vector)
         {
-            coordinate.XAbs += vector.X;
-            coordinate.YAbs += vector.Y;
-
-            return coordinate;
+            return new Coordinate(coordinate.Quadrant, coordinate.XAbs + vector.X, coordinate.YAbs + vector.Y);
         }
 
         public static Coordinate operator -(Coordinate coordinate, Vector2D vector)
         {
-            coordinate.XAbs -= vector.X;
-            coordinate.YAbs -= vector.Y;
-
-            return coordinate;
+            return coordinate + (-vector);
         }
 
         public int CalculateDistance(Coordinate to)

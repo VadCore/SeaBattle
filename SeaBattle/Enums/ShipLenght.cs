@@ -8,6 +8,7 @@ namespace SeaBattle.Enums
     {
         Small = 1,
         Middle = 3,
-        Large = 5
+        Large = 5,
+        Huge = 7
     }
 }

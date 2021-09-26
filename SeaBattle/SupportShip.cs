@@ -1,20 +1,20 @@
-﻿using System;
+﻿using SeaBattle.Enums;
+using SeaBattle.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace SeaBattle
 {
-    public class SupportShip : Ship
+    public class SupportShip : Ship, ISupportShip
     {
-        public SupportShip(int playerId, int length, bool isHorizontal) : base(playerId, length, isHorizontal, 5)
+        private SupportShip(int playerId, ShipLenght length, Rotation rotation) : base(playerId, length, rotation, 5)
         {
         }
 
-        public override bool Shoot(Square square)
+        public static ISupportShip Create(int playerId, ShipLenght length, Rotation rotation)
         {
-            Console.WriteLine("Shooting is invalid!");
-
-            return false;
+            return new SupportShip(playerId, length, rotation);
         }
     }
 }

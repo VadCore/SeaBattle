@@ -17,7 +17,7 @@ namespace SeaBattle.Interfaces
 
         public Ship GetTargetShip(Coordinate coordinate);
 
-        public void Hurt(int damage);
+        public void Damage(int damage);
 
         public void Heal(int healShot);
 
@@ -31,7 +31,7 @@ namespace SeaBattle.Interfaces
 
         public bool Relocate(Coordinate from, Coordinate to);
 
-        public bool Rotate();
+        public bool Rotate(Rotation target);
 
     }
 }

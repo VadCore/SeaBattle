@@ -9,17 +9,23 @@ namespace SeaBattle
     {
         public static readonly int shipLengthMax = 4;
         public static readonly int shipSpeedMax = 5;
-        public int Id { get; set; }
-        public int Length { get; private set; }
+
         public int Range { get; set; } = 3;
+
+        public int Length { get; private set; }
         public int Speed => shipSpeedMax - Length;
+        public int HealthMax { get; set; }
+        public int DamageShot { get; set; }
+        public int HealShot { get; set; }
+
+        public int Id { get; set; }
         public int PlayerId { get; private set; }
         public Rotation Rotation { get; set; }
         public Coordinate Coordinate { get; set; }
-        public int Damage { get; set; }
-        public int HealthMax { get; set; }
+        
+        
         public int Health { get; set; }
-        public int HealShot { get; set; }
+        
 
         public Ship(int playerId, ShipLenght length, Rotation rotation, int range)
         {
@@ -27,7 +33,7 @@ namespace SeaBattle
             Length = (int)length;
             HealthMax = Length;
             Health = HealthMax;
-            Damage = (Length - 1) / 2 + 1;
+            DamageShot = (Length - 1) / 2 + 1;
             HealShot = (Length - 1) / 2 + 1;
             Rotation = rotation;
             Range = range;
@@ -55,12 +61,12 @@ namespace SeaBattle
         public bool Shoot(Coordinate coordinate)
         {
             var targetShip = GetTargetShip(coordinate);
-            targetShip?.Hurt(Damage);
+            targetShip?.Damage(DamageShot);
 
             return targetShip != null;
         }
 
-        public void Hurt(int damage)
+        public void Damage(int damage)
         {
             Health -= damage;
             Console.WriteLine("Hit");
@@ -97,7 +103,7 @@ namespace SeaBattle
 
             var step = Vector2D.Create(Rotation);
 
-            from -= step * (Length / 2);
+            from -= (Length / 2) * step;
 
             int distanceMin = int.MaxValue;
 
@@ -121,17 +127,16 @@ namespace SeaBattle
 
             var step = Vector2D.Create(Rotation);
 
-            to -= step * (Length / 2);
+            to -= (Length / 2) * step;
 
-            for (int i = Length; i > 0; i--)
+            for (int i = 0; i < Length; i++)
             {
-                if (Game.Board[to] != null)
+                if (Game.Board[to] != null && Game.Board[to] != this)
                 {
-                    for (; i <= Length; i++)
+                    for (i--; i >= 0; i--)
                     {
-                        Game.Board[to] = null;
-
                         to -= step;
+                        Game.Board[to] = null;
                     }
 
                     Console.WriteLine("Coordinate is not free!!!");
@@ -153,7 +158,7 @@ namespace SeaBattle
         {
             var step = Vector2D.Create(Rotation);
 
-            from -= step * (Length / 2);
+            from -= (Length / 2) * step;
 
             for (int i = Length; i > 0; i--)
             {
@@ -176,27 +181,32 @@ namespace SeaBattle
                 return false;
             }
 
-            if (!Allocate(to))
-                return false;
-
             Dislocate(from);
+
+            if (!Allocate(to))
+            {
+                Allocate(from);
+                return false;
+            }
 
             return true;
         }
 
-        public bool Rotate()
+        public bool Rotate(Rotation target)
         {
-            Rotation = Rotation.Vertical;
+            var currentRotation = Rotation;
+            
+            Dislocate(Coordinate);
+
+            Rotation = target;
 
             if (!Allocate(Coordinate))
             {
+                Rotation = currentRotation;
+                Allocate(Coordinate);
+
                 return false;
             }
-
-            Rotation = Rotation.Vertical;
-            Dislocate(Coordinate);
-
-            Rotation = Rotation.Vertical;
 
             return true;
         }
