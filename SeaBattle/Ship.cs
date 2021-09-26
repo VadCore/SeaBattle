@@ -22,7 +22,7 @@ namespace SeaBattle
         public int DamageShot => damageShot;
         public int HealShot => healShot;
 
-        public IAbility Ability { get; } = new TAbility();
+        public IAbility Ability { get; }
 
 
         public Ship(int id, int playerId, Coordinate coordinate, Rotation rotation) : base(id, playerId, rotation, coordinate, healthMax)

@@ -15,6 +15,7 @@ namespace SeaBattle
 
         public BigShip(int id, int playerId, Coordinate coordinate, Rotation rotation) : base(id, playerId, coordinate, rotation)
         {
+            Ability.Ship = this;
         }
 
 

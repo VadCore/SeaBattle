@@ -7,5 +7,7 @@ namespace SeaBattle.Interfaces
     public interface IAbility
     {
         public int Range { get; }
+
+        public IShip Ship { get; set; }
     }
 }

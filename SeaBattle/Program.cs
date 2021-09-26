@@ -15,7 +15,7 @@ namespace SeaBattle
 
             var coord1 = new Coordinate(0, 1, 2);
 
-            var battleSmallShip1 = new SmallShip<Support>(0, 1, coord1, Rotation.Horizontal);
+            IShip battleSmallShip1 = new SmallShip<Support>(0, 1, coord1, Rotation.Horizontal);
 
             var battleBigShip1 = new BigShip<Battle>(0, 1, new Coordinate(1, 2, 4), Rotation.Horizontal);
 
