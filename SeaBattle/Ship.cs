@@ -1,47 +1,38 @@
 ﻿using SeaBattle.Enums;
+using SeaBattle.Extansions;
+using SeaBattle.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace SeaBattle
 {
-    public abstract class Ship
+    public abstract class Ship<TAbility> : Unit, IShip where TAbility : IAbility, new()
     {
-        public static readonly int shipLengthMax = 4;
-        public static readonly int shipSpeedMax = 5;
 
-        public int Range { get; set; } = 3;
+        private static int length;
+        private static int speed;
+        private static int healthMax;
+        private static int damageShot;
+        private static int healShot;
 
-        public int Length { get; private set; }
-        public int Speed => shipSpeedMax - Length;
-        public int HealthMax { get; set; }
-        public int DamageShot { get; set; }
-        public int HealShot { get; set; }
+        public int Length => length;
+        public int Speed => speed;
+        public int HealthMax => healthMax;
+        public int DamageShot => damageShot;
+        public int HealShot => healShot;
 
-        public int Id { get; set; }
-        public int PlayerId { get; private set; }
-        public Rotation Rotation { get; set; }
-        public Coordinate Coordinate { get; set; }
-        
-        
-        public int Health { get; set; }
-        
+        public IAbility Ability { get; } = new TAbility();
 
-        public Ship(int playerId, ShipLenght length, Rotation rotation, int range)
+
+        public Ship(int id, int playerId, Coordinate coordinate, Rotation rotation) : base(id, playerId, rotation, coordinate, healthMax)
         {
-            PlayerId = playerId;
-            Length = (int)length;
-            HealthMax = Length;
-            Health = HealthMax;
-            DamageShot = (Length - 1) / 2 + 1;
-            HealShot = (Length - 1) / 2 + 1;
-            Rotation = rotation;
-            Range = range;
+            Allocate(coordinate);
         }
 
-        public Ship GetTargetShip(Coordinate coordinate)
+        public IShip GetTargetShip(Coordinate coordinate)
         {
-            if (CalculateDistance(coordinate) > Range)
+            if (CalculateDistance(coordinate) > Ability.Range)
             {
                 Console.WriteLine("The target is too far");
 
@@ -61,9 +52,8 @@ namespace SeaBattle
         public bool Shoot(Coordinate coordinate)
         {
             var targetShip = GetTargetShip(coordinate);
-            targetShip?.Damage(DamageShot);
 
-            return targetShip != null;
+            return ((IBattle)Ability).Shoot(targetShip, DamageShot);
         }
 
         public void Damage(int damage)
@@ -81,9 +71,8 @@ namespace SeaBattle
         public bool Repair(Coordinate coordinate)
         {
             var targetShip = GetTargetShip(coordinate);
-            targetShip?.Heal(HealShot);
 
-            return targetShip != null;
+            return ((ISupport)Ability).Repair(targetShip, HealShot);
         }
 
         public void Heal(int healShot)
@@ -209,6 +198,18 @@ namespace SeaBattle
             }
 
             return true;
+        }
+
+        protected static void SetCharacteristics(int length, int speed, int damageShot, int healShot, int healthMax)
+        {
+            if (length % 2 != 1)
+                throw new ArgumentException("Length must be odd number");
+
+            Ship<TAbility>.length = length.ExceptionIfNotBetweenMinMax(0);
+            Ship<TAbility>.speed = speed.ExceptionIfNotBetweenMinMax(0);
+            Ship<TAbility>.damageShot = damageShot.ExceptionIfNotBetweenMinMax(0);
+            Ship<TAbility>.healShot = healShot.ExceptionIfNotBetweenMinMax(0);
+            Ship<TAbility>.healthMax = healthMax.ExceptionIfNotBetweenMinMax(0);
         }
     }
 }

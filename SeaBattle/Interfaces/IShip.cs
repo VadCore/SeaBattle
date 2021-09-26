@@ -7,15 +7,16 @@ namespace SeaBattle.Interfaces
 {
     public interface IShip
     {
-        public int Id { get; set; }
         public int Length { get; }
-        public int Range { get; set; }
         public int Speed { get; }
-        public int PlayerId { get; }
-        public Rotation Rotation { get; set; }
-        public Coordinate Coordinate { get; set; }
+        public int HealthMax { get;}
+        public int DamageShot { get;}
+        public int HealShot { get; }
 
-        public Ship GetTargetShip(Coordinate coordinate);
+        public IAbility Ability { get; }
+
+        public IShip GetTargetShip(Coordinate coordinate);
+
 
         public void Damage(int damage);
 

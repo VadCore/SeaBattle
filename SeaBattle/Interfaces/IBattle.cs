@@ -4,8 +4,8 @@ using System.Text;
 
 namespace SeaBattle.Interfaces
 {
-    public interface IWarShip : IShip
+    public interface IBattle : IAbility
     {
-        bool Shoot(Coordinate coordinate);
+        public bool Shoot(IShip targetShip, int damageShot);
     }
 }
