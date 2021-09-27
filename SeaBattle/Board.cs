@@ -28,7 +28,5 @@ namespace SeaBattle
                 coordinateShips[coordinate.Quadrant, coordinate.XAbs, coordinate.YAbs] = value;
             }
         }
-
-
     }
 }
