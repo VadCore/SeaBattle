@@ -4,10 +4,8 @@ using System.Text;
 
 namespace SeaBattle.Interfaces
 {
-    public interface IAbility
+    public interface IPossibleBeSupport
     {
-        public int Range { get; }
-
-        public IUnit Unit { get; set; }
+        public int HealShot { get; }
     }
 }

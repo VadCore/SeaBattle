@@ -8,6 +8,7 @@ namespace SeaBattle
 {
     public class Universal : Ability, IUniversal
     {
-        public int Range => 3;
+        private static readonly int range = 3;
+        public override int Range => range;
     }
 }

@@ -16,20 +16,6 @@ namespace SeaBattle
 
         public HugeShip(int id, int playerId, Coordinate coordinate, Rotation rotation) : base(id, playerId, coordinate, rotation)
         {
-            Ability.Ship = this;
         }
-
-
-
-
-        //public override int Length => 7;
-
-        //public override int Speed => 1;
-
-        //public override int HealthMax => 5;
-
-        //public override int DamageShot => 4;
-
-        //public override int HealShot => 2;
     }
 }

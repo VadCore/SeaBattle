@@ -28,7 +28,7 @@ namespace SeaBattle
 
         public static Vector2D Create(Rotation rotation)
         {
-            if(rotation == Rotation.Horizontal)
+            if (rotation == Rotation.Horizontal)
             {
                 return new Vector2D(1, 0);
             }

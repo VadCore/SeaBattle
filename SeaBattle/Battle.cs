@@ -8,6 +8,7 @@ namespace SeaBattle
 {
     public class Battle : Ability, IBattle
     {
-        public int Range => 5;
+        private static readonly int range = 5;
+        public override int Range => range;
     }
 }

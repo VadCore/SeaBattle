@@ -6,6 +6,7 @@ namespace SeaBattle
 {
     public static class Game
     {
-        public static Board Board { get; set; } = new Board(15, 15);
+        public static Board Board { get; } = new Board(15, 15);
+        public static int Turn { get; set; }
     }
 }

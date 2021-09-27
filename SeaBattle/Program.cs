@@ -26,7 +26,7 @@ namespace SeaBattle
 
             if (battleSmallShip1.Ability is IBattle battle)
             {
-                 battle.Shoot(new Coordinate(1, 2, 4));
+                battle.Shoot(new Coordinate(1, 2, 4));
             }
 
 

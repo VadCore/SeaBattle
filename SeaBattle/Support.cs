@@ -8,6 +8,7 @@ namespace SeaBattle
 {
     public class Support : Ability, ISupport
     {
-        public int Range => 4;
+        private static readonly int range = 4;
+        public override int Range => range;
     }
 }

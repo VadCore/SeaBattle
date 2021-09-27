@@ -9,16 +9,16 @@ namespace SeaBattle
     {
         public readonly int XAbsMax;
         public readonly int YAbsMax;
-        private IShip[,,] coordinateShips;
+        private readonly IUnit[,,] coordinateShips;
 
         public Board(int xAbsMax, int yAbsMax)
         {
             XAbsMax = xAbsMax;
             YAbsMax = yAbsMax;
-            coordinateShips = new IShip[4, XAbsMax, YAbsMax];
+            coordinateShips = new IUnit[4, XAbsMax, YAbsMax];
         }
 
-        public IShip this[Coordinate coordinate]
+        public IUnit this[Coordinate coordinate]
         {
             get
             {

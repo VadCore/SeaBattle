@@ -7,9 +7,9 @@ namespace SeaBattle
 {
     public struct Coordinate
     {
-        public int Quadrant{ get; }
-        public int XAbs{ get; }
-        public int YAbs{ get; }
+        public int Quadrant { get; }
+        public int XAbs { get; }
+        public int YAbs { get; }
 
         public Coordinate(int quadrant, int xAbs, int yAbs)
         {

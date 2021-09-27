@@ -15,20 +15,6 @@ namespace SeaBattle
 
         public SmallShip(int id, int playerId, Coordinate coordinate, Rotation rotation) : base(id, playerId, coordinate, rotation)
         {
-            Ability.Ship = this;
         }
-
-
-
-
-        //public override int Length => 1;
-
-        //public override int Speed => 4;
-
-        //public override int HealthMax => 2;
-
-        //public override int DamageShot => 1;
-
-        //public override int HealShot => 1;
     }
 }
