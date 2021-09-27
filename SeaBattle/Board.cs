@@ -31,5 +31,17 @@ namespace SeaBattle
                 coordinateShips[coordinate.Quadrant, coordinate.XAbs, coordinate.YAbs] = value;
             }
         }
+
+        public IUnit this[int quadrant, int XAbs, int YAbs]
+        {
+            get
+            {
+                return coordinateShips[quadrant, XAbs, YAbs];
+            }
+            set
+            {
+                coordinateShips[quadrant, XAbs, YAbs] = value;
+            }
+        }
     }
 }
