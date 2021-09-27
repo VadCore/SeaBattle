@@ -5,10 +5,10 @@ using System.Text;
 
 namespace SeaBattle
 {
-    public class Vector2D
+    public struct Vector2D
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int X { get; }
+        public int Y { get; }
 
         public Vector2D(int x, int y)
         {
@@ -16,17 +16,19 @@ namespace SeaBattle
             Y = y;
         }
 
-        public static Vector2D operator *(Vector2D vector, int multiplier)
+        public static Vector2D operator *(int multiplier, Vector2D vector)
         {
-            vector.X *= multiplier;
-            vector.Y *= multiplier;
+            return new Vector2D(vector.X * multiplier, vector.Y * multiplier);
+        }
 
-            return vector;
+        public static Vector2D operator -(Vector2D vector)
+        {
+            return -1 * vector;
         }
 
         public static Vector2D Create(Rotation rotation)
         {
-            if(rotation == Rotation.Horizontal)
+            if (rotation == Rotation.Horizontal)
             {
                 return new Vector2D(1, 0);
             }

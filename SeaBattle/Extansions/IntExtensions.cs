@@ -4,9 +4,9 @@ using System.Text;
 
 namespace SeaBattle.Extansions
 {
-    public static class IntExtension
+    public static class IntExtensions
     {
-        public static int ExceptionIfNotBetweenMinMax(this int value, int min, int max)
+        public static int ExceptionIfNotBetweenMinMax(this int value, int min = int.MinValue, int max = int.MaxValue)
         {
             if(value >= min && value <= max)
             {

@@ -4,8 +4,7 @@ using System.Text;
 
 namespace SeaBattle.Interfaces
 {
-    public interface ISupportShip : IShip
+    public interface IUniversal : IBattle, ISupport
     {
-        bool Repair(Coordinate coordinate);
     }
 }

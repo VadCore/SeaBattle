@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SeaBattle.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,16 +9,18 @@ namespace SeaBattle
     {
         public readonly int XAbsMax;
         public readonly int YAbsMax;
-        private Ship[,,] coordinateShips;
+        public readonly int quadrants = 4;
+
+        private readonly IUnit[,,] coordinateShips;
 
         public Board(int xAbsMax, int yAbsMax)
         {
             XAbsMax = xAbsMax;
             YAbsMax = yAbsMax;
-            coordinateShips = new Ship[4, XAbsMax, YAbsMax];
+            coordinateShips = new IUnit[quadrants, XAbsMax, YAbsMax];
         }
 
-        public Ship this[Coordinate coordinate]
+        public IUnit this[Coordinate coordinate]
         {
             get
             {
@@ -26,6 +29,18 @@ namespace SeaBattle
             set
             {
                 coordinateShips[coordinate.Quadrant, coordinate.XAbs, coordinate.YAbs] = value;
+            }
+        }
+
+        public IUnit this[int quadrant, int XAbs, int YAbs]
+        {
+            get
+            {
+                return coordinateShips[quadrant, XAbs, YAbs];
+            }
+            set
+            {
+                coordinateShips[quadrant, XAbs, YAbs] = value;
             }
         }
     }

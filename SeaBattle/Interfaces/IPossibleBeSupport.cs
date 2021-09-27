@@ -4,7 +4,8 @@ using System.Text;
 
 namespace SeaBattle.Interfaces
 {
-    public interface IUniversalShip : IWarShip, ISupportShip
+    public interface IPossibleBeSupport
     {
+        public int HealShot { get; }
     }
 }
