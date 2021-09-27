@@ -9,13 +9,15 @@ namespace SeaBattle
     {
         public readonly int XAbsMax;
         public readonly int YAbsMax;
+        public readonly int quadrants = 4;
+
         private readonly IUnit[,,] coordinateShips;
 
         public Board(int xAbsMax, int yAbsMax)
         {
             XAbsMax = xAbsMax;
             YAbsMax = yAbsMax;
-            coordinateShips = new IUnit[4, XAbsMax, YAbsMax];
+            coordinateShips = new IUnit[quadrants, XAbsMax, YAbsMax];
         }
 
         public IUnit this[Coordinate coordinate]

@@ -6,15 +6,9 @@ using System.Text;
 
 namespace SeaBattle
 {
-    public abstract class MovableUnit<TAbility> : Unit<TAbility>, IMovable
-    where TAbility : IAbility, new()
+    public abstract class MovableUnit : Unit, IMovable
     {
         public abstract int Speed { get; }
-
-        public MovableUnit(int id, int playerId, Rotation rotation, Coordinate coordinate, int health)
-          : base(id, playerId, rotation, coordinate, health)
-        {
-        }
 
         public bool Relocate(Coordinate to, Rotation targetRotation)
         {
@@ -28,11 +22,11 @@ namespace SeaBattle
 
             Dislocate(Coordinate);
 
-            Rotation = targetRotation;
+            rotation = targetRotation;
 
             if (!Allocate(to))
             {
-                Rotation = currentRotation;
+                rotation = currentRotation;
                 Allocate(Coordinate);
 
                 return false;
