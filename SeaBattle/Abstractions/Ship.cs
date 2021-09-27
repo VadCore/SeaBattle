@@ -40,5 +40,49 @@ namespace SeaBattle
             Ship<TAbility>.healShot = healShot.ExceptionIfNotBetweenMinMax(0);
             Ship<TAbility>.healthMax = healthMax.ExceptionIfNotBetweenMinMax(0);
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Ship<TAbility> ship &&
+                   Length == ship.Length &&
+                   Speed == ship.Speed &&
+                   EqualityComparer<IAbility>.Default.Equals(Ability, ship.Ability);
+        }
+
+        public override int GetHashCode()
+        {
+            HashCode hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(PlayerId);
+            hash.Add(Coordinate);
+            hash.Add(Health);
+            hash.Add(Length);
+            hash.Add(Ability);
+            hash.Add(Length);
+            return hash.ToHashCode();
+        }
+
+        public static bool operator ==(Ship<TAbility> firstShip, Ship<TAbility> secondShip)
+        {
+           if(firstShip == null ||  secondShip == null)
+            {
+                return false;
+            }
+
+            return firstShip.Speed == secondShip.Speed
+                && firstShip.Length == secondShip.Length
+                && firstShip.GetType() == firstShip.GetType();
+        }
+
+        public static bool operator !=(Ship<TAbility> firstShip, Ship<TAbility> secondShip)
+        {
+            return !(firstShip == secondShip);
+        }
+
+        public override string ToString()
+        {
+            return string.Format($"My coordinate: Quadrant = {Coordinate.Quadrant}, X = {Coordinate.XAbs}, Y = {Coordinate.YAbs}"+
+                 $"My lenght is {Length}, and my speed {Speed}");
+        }
     }
 }
