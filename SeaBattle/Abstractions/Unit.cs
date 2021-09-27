@@ -6,28 +6,33 @@ using System.Text;
 
 namespace SeaBattle
 {
-    public abstract class Unit<TAbility> : IUnit where TAbility : IAbility, new()
+    public abstract class Unit : IUnit
     {
-        public int Id { get; }
-        public int PlayerId { get; }
-        public Rotation Rotation { get; set; }
-        public Coordinate Coordinate { get; set; }
-        public int Health { get; protected set; }
+        protected Rotation rotation;
+        protected Coordinate coordinate;
+        protected int health;
+
+        public int Id { get; init; }
+        public int PlayerId { get; init; }
+        public Rotation Rotation { get => rotation; init => rotation = value; }
+        public Coordinate Coordinate { get => coordinate; init => coordinate = value; }
+        public int Health { get => health; init => health = value; }
 
         public abstract int Length { get; }
         public abstract int HealthMax { get; }
 
-        public IAbility Ability { get; }
+        public IAbility Ability { get; init; }
 
-        public Unit(int id, int playerId, Rotation rotation, Coordinate coordinate, int health)
+
+        public static IUnit Create<TKind, TAbility>(int id, int playerId, Coordinate coordinate, Rotation rotation, int health)
+          where TKind : IUnit, new()
+          where TAbility : IAbility, new()
         {
-            Id = id;
-            PlayerId = playerId;
-            Rotation = rotation;
-            Coordinate = coordinate;
-            Health = health;
+            var unit = new TKind() { Id = id, PlayerId = playerId, Coordinate = coordinate, Rotation = rotation, Health = health, Ability = new TAbility() };
 
-            Ability = new TAbility() { Unit = this };
+            unit.Allocate(coordinate);
+
+            return unit;
         }
 
         public int CalculateDistance(Coordinate to)
@@ -82,7 +87,7 @@ namespace SeaBattle
                 to += step;
             }
 
-            Coordinate = to;
+            coordinate = to;
 
             return true;
         }
@@ -108,7 +113,7 @@ namespace SeaBattle
 
         public void Damage(int damage)
         {
-            Health -= damage;
+            health -= damage;
             Console.WriteLine("Hit");
 
             if (Health <= 0)
@@ -120,7 +125,7 @@ namespace SeaBattle
 
         public void Heal(int healShot)
         {
-            Health = Math.Max(Health + healShot, HealthMax);
+            health = Math.Max(Health + healShot, HealthMax);
             Console.WriteLine("Heal");
 
             if (Health == HealthMax)
