@@ -1,17 +1,27 @@
-﻿using SeaBattle.Enums;
+﻿using Newtonsoft.Json;
+using SeaBattle.Enums;
 using SeaBattle.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace SeaBattle
 {
     public abstract class Ability
     {
+        //[JsonIgnore]
+        
         public IUnit Unit { get; set; }
         public int RechargedTurn { get; set; }
         public static readonly int rechargingPeriodTurnsCount = 2;
         public abstract int Range { get; }
+        [JsonIgnore]
+        public Game Game => Unit.Player.Game;
+        [JsonIgnore]
+        public Board Board => Game.Board;
+
+
 
         private IUnit GetTargetUnit(Coordinate coordinate)
         {
@@ -22,7 +32,7 @@ namespace SeaBattle
                 return null;
             }
 
-            var targetShip = Game.Board[coordinate];
+            var targetShip = Board[coordinate];
 
             if (targetShip is null)
             {
@@ -41,6 +51,8 @@ namespace SeaBattle
 
             var targetShip = GetTargetUnit(coordinate);
             targetShip?.Damage(((IPossibleBeBattle)Unit).DamageShot);
+
+            
 
             return targetShip != null;
         }

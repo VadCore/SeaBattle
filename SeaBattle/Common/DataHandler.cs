@@ -14,7 +14,7 @@ namespace SeaBattle.Common
         private static readonly string pathToShip = @"D:\.NET Nix Projects\SeaBattle1\Ships.json";
         private static readonly string pathToBoard = @"D:\.NET Nix Projects\SeaBattle1\Boards.json";
 
-        public static async Task SaveAllToFileAsync()
+        public static void SaveAllToFileAsync()
         {
             
         }
