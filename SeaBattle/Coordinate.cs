@@ -26,7 +26,7 @@ namespace SeaBattle
                 xAbs *= -1;
             }
 
-            XAbs = xAbs.ExceptionIfNotBetweenMinMax(0, Game.Board.XAbsMax);
+            XAbs = xAbs.ExceptionIfNotBetweenMinMax(0, Board.XAbsMax);
 
             if (Quadrant / 2 == 0 && yAbs < 0)
             {
@@ -39,7 +39,7 @@ namespace SeaBattle
                 yAbs *= -1;
             }
 
-            YAbs = yAbs.ExceptionIfNotBetweenMinMax(0, Game.Board.YAbsMax);
+            YAbs = yAbs.ExceptionIfNotBetweenMinMax(0, Board.YAbsMax);
         }
 
         public static Coordinate operator +(Coordinate coordinate, Vector2D vector)
