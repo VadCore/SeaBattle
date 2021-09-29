@@ -8,7 +8,7 @@ using System.Text;
 
 namespace SeaBattle
 {
-    public abstract class Ability
+    public abstract class Ability : IAbility
     {
         //[JsonIgnore]
         
