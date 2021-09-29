@@ -16,8 +16,6 @@ namespace SeaBattle
         private static int damageShot;
         private static int healShot;
 
-        
-
         public sealed override int Length => length;
         public sealed override int Speed => speed;
         public sealed override int HealthMax => healthMax;

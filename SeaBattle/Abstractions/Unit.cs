@@ -101,6 +101,8 @@ namespace SeaBattle
 
             coordinate = to;
 
+            Game.Save();
+
             return true;
         }
 
@@ -116,6 +118,8 @@ namespace SeaBattle
 
                 from += step;
             }
+
+            Game.Save();
         }
 
         public void Dislocate()
@@ -133,6 +137,8 @@ namespace SeaBattle
                 Console.WriteLine("Sunk");
                 Dislocate();
             }
+
+            Game.Save();
         }
 
         public void Heal(int healShot)
@@ -144,6 +150,8 @@ namespace SeaBattle
             {
                 Console.WriteLine("Completely Healed");
             }
+
+            Game.Save();
         }
     }
 }

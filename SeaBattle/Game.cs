@@ -48,9 +48,7 @@ namespace SeaBattle
         {
             Console.WriteLine("Setup game!");
 
-            //var ships = new List<IShip>();
-
-            Players = new Player[] { new Player(2, this), new Player(3, this) };
+            Players = new Player[] { new Player(1, this), new Player(2, this) };
 
             Players[0].Units.Add(SmallShip.Create<Battle>(0, Players[0], new Coordinate(0, 1, 2), Rotation.Horizontal));
             Players[1].Units.Add(BigShip.Create<Battle>(0, Players[1], new Coordinate(1, 2, 4), Rotation.Vertical));
@@ -60,9 +58,6 @@ namespace SeaBattle
         {
 
             Console.WriteLine("Run Game!");
-
-            //Console.WriteLine("Max Health " + SmallShip<Battle>.healthMax);
-            //Console.WriteLine("Max HealthMax  " + battleBigShip1.HealthMax);
 
             if (Players[0].Units[0].Ability is IBattle battle)
             {
@@ -93,8 +88,6 @@ namespace SeaBattle
 
             string serializedGame;
 
-            
-
             if (File.Exists(path))
             {
                 serializedGame = File.ReadAllText(path);
@@ -105,34 +98,9 @@ namespace SeaBattle
                 Console.WriteLine("This game not found!");
                 return null;
             }
-
-
-
             Console.WriteLine("Start Desirialize");
 
             var result = JsonConvert.DeserializeObject<Game>(serializedGame, settings);
-
-            //var returnAfterDeserialize = result.Players[1].Units[0];
-            //Console.WriteLine("My Length: " + returnAfterDeserialize.Length + " my rotation: " + returnAfterDeserialize.Rotation);
-
-
-            //Console.WriteLine("End Result");
-
-            ////string jsonString = JsonSerializer.Serialize(this, options);
-
-
-            ////var result = JsonSerializer.Deserialize<Game>(jsonString);
-
-
-
-
-            //if (result.Players[0].Units[0].Ability is IBattle battle)
-            //{
-            //    battle.Shoot(new Coordinate(1, 2, 4));
-            //    Console.WriteLine("I'am shoot!");
-            //}
-
-            //Console.WriteLine(result.Board);
 
             return result;
         }
