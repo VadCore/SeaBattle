@@ -1,7 +1,6 @@
 ﻿using SeaBattle.Enums;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text;
 
 namespace SeaBattle.Interfaces
@@ -10,8 +9,6 @@ namespace SeaBattle.Interfaces
     {
         public int Id { get; init; }
         public int PlayerId { get; init; }
-
-        public Player Player { get; set; }
         public Rotation Rotation { get; init; }
         public Coordinate Coordinate { get; init; }
         public int Health { get; init; }
@@ -19,8 +16,7 @@ namespace SeaBattle.Interfaces
         public int Length { get; }
         public int HealthMax { get; }
 
-        public Board Board { get;}
-        public IAbility Ability { get; set; }
+        public IAbility Ability { get; init; }
 
         public int CalculateDistance(Coordinate to);
 

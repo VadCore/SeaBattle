@@ -1,23 +1,23 @@
-﻿using Newtonsoft.Json;
-using SeaBattle.Interfaces;
+﻿using SeaBattle.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace SeaBattle
 {
     public class Board
     {
-        public static readonly int XAbsMax = 15;
-        public static readonly int YAbsMax = 15;
-        public static readonly int quadrants = 4;
-        [JsonProperty]
-        private IUnit[,,] coordinateShips;
+        public readonly int XAbsMax;
+        public readonly int YAbsMax;
+        public readonly int quadrants = 4;
 
-        public Board()
+        private readonly IUnit[,,] coordinateShips;
+
+        public Board(int xAbsMax, int yAbsMax)
         {
-            coordinateShips = new IUnit[quadrants, XAbsMax + 1, YAbsMax + 1];
+            XAbsMax = xAbsMax;
+            YAbsMax = yAbsMax;
+            coordinateShips = new IUnit[quadrants, XAbsMax, YAbsMax];
         }
 
         public IUnit this[Coordinate coordinate]
@@ -32,29 +32,16 @@ namespace SeaBattle
             }
         }
 
-        public override string ToString()
+        public IUnit this[int quadrant, int XAbs, int YAbs]
         {
-            var sortedUnits = new List<IUnit>();
-
-            for (int d = 0, dLim = Math.Max(XAbsMax, YAbsMax); d <= dLim; d++)
+            get
             {
-                for (int q = 0; q < quadrants; q++)
-                {
-                    for (int i = 0; i <= d; i++)
-                    {
-                        if (d <= XAbsMax && i <= YAbsMax && coordinateShips[q, d, i] != null)
-                            sortedUnits.Add(coordinateShips[q, d, i]);
-
-                        if (i <= XAbsMax && d <= YAbsMax && coordinateShips[q, i, d] != null)
-                            sortedUnits.Add(coordinateShips[q, i, d]);
-                    }
-                }
+                return coordinateShips[quadrant, XAbs, YAbs];
             }
-
-            var distinctSortedUnits = sortedUnits.Distinct().ToList();
-
-            return string.Join('|', distinctSortedUnits);
+            set
+            {
+                coordinateShips[quadrant, XAbs, YAbs] = value;
+            }
         }
-
     }
 }

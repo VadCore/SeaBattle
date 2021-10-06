@@ -2,9 +2,7 @@
 using SeaBattle.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace SeaBattle
 {
@@ -16,11 +14,6 @@ namespace SeaBattle
 
         public int Id { get; init; }
         public int PlayerId { get; init; }
-
-        //[JsonIgnore]
-        
-        public Player Player { get; set; }
-
         public Rotation Rotation { get => rotation; init => rotation = value; }
         public Coordinate Coordinate { get => coordinate; init => coordinate = value; }
         public int Health { get => health; init => health = value; }
@@ -28,20 +21,15 @@ namespace SeaBattle
         public abstract int Length { get; }
         public abstract int HealthMax { get; }
 
-        public IAbility Ability { get; set; }
-        [JsonIgnore]
-        public Game Game => Player.Game;
-
-        [JsonIgnore]
-        public Board Board => Game.Board;
+        public IAbility Ability { get; init; }
 
 
-        public static IUnit Create<TKind, TAbility>(int id, Player player, Coordinate coordinate, Rotation rotation, int health)
+        public static IUnit Create<TKind, TAbility>(int id, int playerId, Coordinate coordinate, Rotation rotation, int health)
           where TKind : IUnit, new()
           where TAbility : IAbility, new()
         {
-            var unit = new TKind() { Id = id, Player = player, Coordinate = coordinate, Rotation = rotation, Health = health };
-            unit.Ability = new TAbility() { Unit = unit };
+            var unit = new TKind() { Id = id, PlayerId = playerId, Coordinate = coordinate, Rotation = rotation, Health = health, Ability = new TAbility() };
+
             unit.Allocate(coordinate);
 
             return unit;
@@ -69,8 +57,8 @@ namespace SeaBattle
 
         public bool Allocate(Coordinate to)
         {
-            if (to.XAbs + (Rotation == Rotation.Horizontal ? Length / 2 : 0) > Board.XAbsMax
-             || to.YAbs + (Rotation == Rotation.Vertical ? Length / 2 : 0) > Board.YAbsMax)
+            if (to.XAbs + (Rotation == Rotation.Horizontal ? Length / 2 : 0) > Game.Board.XAbsMax
+            || to.YAbs + (Rotation == Rotation.Vertical ? Length / 2 : 0) > Game.Board.YAbsMax)
             {
                 return false;
             }
@@ -81,12 +69,12 @@ namespace SeaBattle
 
             for (int i = 0; i < Length; i++)
             {
-                if (Board[to] != null && Board[to] != this)
+                if (Game.Board[to] != null && Game.Board[to] != this)
                 {
                     for (i--; i >= 0; i--)
                     {
                         to -= step;
-                        Board[to] = null;
+                        Game.Board[to] = null;
                     }
 
                     Console.WriteLine("Coordinate is not free!!!");
@@ -94,14 +82,12 @@ namespace SeaBattle
                     return false;
                 }
 
-                Board[to] = this;
+                Game.Board[to] = this;
 
                 to += step;
             }
 
             coordinate = to;
-
-            Game.Save();
 
             return true;
         }
@@ -114,12 +100,10 @@ namespace SeaBattle
 
             for (int i = Length; i > 0; i--)
             {
-                Board[from] = null;
+                Game.Board[from] = null;
 
                 from += step;
             }
-
-            Game.Save();
         }
 
         public void Dislocate()
@@ -137,8 +121,6 @@ namespace SeaBattle
                 Console.WriteLine("Sunk");
                 Dislocate();
             }
-
-            Game.Save();
         }
 
         public void Heal(int healShot)
@@ -150,8 +132,6 @@ namespace SeaBattle
             {
                 Console.WriteLine("Completely Healed");
             }
-
-            Game.Save();
         }
     }
 }
