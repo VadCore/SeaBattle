@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SeaBattle
 {
-    public abstract class Ability
+    public abstract class Ability : IAbility
     {
         public IUnit Unit { get; set; }
         public int RechargedTurn { get; set; }
