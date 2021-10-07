@@ -16,13 +16,6 @@ namespace SeaBattle.Infrastructure.Data
     {
         private static readonly string path = @"..\..\..\..\SeaBattle.Infrastructure\Data\SaveData.json";
 
-        //private static readonly JsonSerializerOptions options = new JsonSerializerOptions//(JsonSerializerDefaults.Web)
-        //{
-        //    WriteIndented = true,
-        //    ReferenceHandler = ReferenceHandler.Preserve,
-
-        //};
-
         private static JsonSerializerSettings settings = new JsonSerializerSettings
         {
             PreserveReferencesHandling = PreserveReferencesHandling.Objects,

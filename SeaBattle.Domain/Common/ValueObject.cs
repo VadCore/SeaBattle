@@ -38,7 +38,7 @@ namespace SeaBattle.Domain.Common
 
 		public static bool operator ==(ValueObject<T> left, T right)
 		{
-			return !(left is null ^ right is null) && (left is null || left.Equals(right));
+			return (left is null == right is null) && (left is null || left.Equals(right));
 		}
 
 		public static bool operator !=(ValueObject<T> left, T right)
