@@ -26,11 +26,6 @@ namespace SeaBattle.Domain.Entities
 		public BattleAbility BattleAbility { get; set; }
 		public SupportAbility SupportAbility { get; set; }
 
-
-		[JsonIgnore]
-		public Board Board => Player.Board;
-
-
 		public Ship(int sizeId, int playerId, int health)
 		{
 			SizeId = sizeId;
