@@ -23,8 +23,6 @@ namespace SeaBattle.Application.Services
 
             if (shipFrom.CalculateDistance(coordinate, size.Length) > size.Range)
             {
-                Console.WriteLine("The target is too far");
-
                 return null;
             }
 
@@ -33,8 +31,6 @@ namespace SeaBattle.Application.Services
 
             if (shipId == 0)
             {
-                Console.WriteLine("Missed");
-
                 return null;
             }
 
@@ -53,7 +49,6 @@ namespace SeaBattle.Application.Services
             }
             else
             {
-                Console.WriteLine("Recharging of this unit isn't complete yet!");
                 return false;
             }
 

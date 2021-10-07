@@ -16,13 +16,12 @@ namespace SeaBattle.Infrastructure.Data
     {
         private static readonly string path = @"..\..\..\..\SeaBattle.Infrastructure\Data\SaveData.json";
 
-        private static readonly JsonSerializerOptions options = new JsonSerializerOptions//(JsonSerializerDefaults.Web) 
+        //private static readonly JsonSerializerOptions options = new JsonSerializerOptions//(JsonSerializerDefaults.Web)
+        //{
+        //    WriteIndented = true,
+        //    ReferenceHandler = ReferenceHandler.Preserve,
 
-        {
-            WriteIndented = true,
-            ReferenceHandler = ReferenceHandler.Preserve,
-
-        };
+        //};
 
         private static JsonSerializerSettings settings = new JsonSerializerSettings
         {
@@ -36,16 +35,9 @@ namespace SeaBattle.Infrastructure.Data
 
         public void SaveContext(TContext context)
         {
-
-            //string serializedContext = JsonSerializer.Serialize(context, options);
-
             string serializedContext = JsonConvert.SerializeObject(context, settings);
 
             File.WriteAllText(path, serializedContext, Encoding.UTF8);
-
-            Console.WriteLine("Serialization process");
-
-            //Console.WriteLine("Result: " + serializedContext);
         }
 
         public TContext Load()
@@ -58,13 +50,8 @@ namespace SeaBattle.Infrastructure.Data
             }
             else
             {
-                Console.WriteLine("This game not found!");
                 return null;
             }
-
-            Console.WriteLine("Start Desirialize");
-
-            //var context = JsonSerializer.Deserialize<TContext>(serializedContext, options);
 
             var context = JsonConvert.DeserializeObject<TContext>(serializedContext, settings);
 

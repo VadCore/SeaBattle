@@ -41,7 +41,6 @@ namespace SeaBattle.Application.Services
 
 			if (targetShip.Health <= 0)
 			{
-				Console.WriteLine("Sunk");
 				_shipService.Dislocate(targetShip);
 			}
 

@@ -102,8 +102,6 @@ namespace SeaBattle.Application.Services
 																 && cs.Coordinate == to).ShipId = 0;
 					}
 
-					Console.WriteLine("Coordinate is not free!!!");
-
 					return false;
 				}
 
@@ -157,7 +155,6 @@ namespace SeaBattle.Application.Services
 
 			if (ship.Coordinate.CalculateDistance(to) > size.Speed)
 			{
-				Console.WriteLine("It's very fast for you");
 				return false;
 			}
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SeaBattle.Application.Services;
 using SeaBattle.Application.Services.Interfaces;
@@ -8,21 +7,18 @@ using SeaBattle.Infrastructure;
 using SeaBattle.Infrastructure.Data;
 using SeaBattle.Infrastructure.Interfaces;
 using SeaBattle.Infrastructure.Repositories;
+using System;
 
 namespace SeaBattle.UI
 {
-	class Program
-	{
-		//public static object Host { get; private set; }
-
+    class Program
+    {
 		static void Main(string[] args)
 		{
 			var host = Host.CreateDefaultBuilder()
 				.ConfigureServices((context, services) =>
 				{
 					services.AddScoped(typeof(IDataHandler<>), typeof(DataHandler<>));
-					//services.AddScoped<IDataContext, SeaBattleContext>();
-
 
 					services.AddScoped<IDataContext>(options =>
 					{
