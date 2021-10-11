@@ -16,7 +16,6 @@ namespace SeaBattle.Domain.Interfaces
 		public IRepository<SupportAbility> SupportAbilities { get; }
 		public IRepository<CoordinateShip> CoordinateShips { get; }
 		public IRepository<Size> Sizes { get; }
-
 		public void Commit();
 	}
 }

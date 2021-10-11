@@ -20,13 +20,15 @@ namespace SeaBattle.Application.Services
 		{
 			var board = _unitOfWork.Boards.Add(new Board(xAbsMax, yAbsMax));
 
-			for (int q = 0; q < Board.quadrants; q++)
+			for (int q = 0; q < Board.Quadrants; q++)
 			{
 				for (int x = 0; x <= xAbsMax; x++)
 				{
 					for (int y = 0; y <= yAbsMax; y++)
 					{
-						_unitOfWork.CoordinateShips.Add(new CoordinateShip(board.Id, new Coordinate(q, x, y)));
+						var coordinateShip = new CoordinateShip(board.Id, new Coordinate(q, x, y));
+						_unitOfWork.CoordinateShips.Add(coordinateShip);
+						board.CoordinateShips.Add(coordinateShip);
 					}
 				}
 			}

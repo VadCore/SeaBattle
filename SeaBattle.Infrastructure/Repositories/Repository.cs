@@ -1,6 +1,5 @@
 ﻿using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
-using SeaBattle.Infrastructure.Common;
 using SeaBattle.Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,17 +11,31 @@ namespace SeaBattle.Infrastructure.Repositories
 {
 	public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
 	{
-		protected readonly DataSet<TEntity> entities;
-		protected readonly IDataContext _context;
+		private static int nextId = 1;
 
-		public Repository(IDataContext context)
-		{
-			_context = context;
-			entities = _context.Set<TEntity>();
+		private readonly IList<TEntity> entities = new List<TEntity>();
+
+
+		public IList<TEntity> Entities => entities;
+
+
+		public Repository(IList<TEntity> entities) : this()
+        {
+            this.entities = entities;
+        }
+
+        public Repository()
+        {
+			if (nextId == 1 && entities.Count != 0)
+			{
+				ResetNextId();
+			}
 		}
 
-		public TEntity Add(TEntity entity)
+        public TEntity Add(TEntity entity)
 		{
+			entity.Id = nextId++;
+
 			entities.Add(entity);
 
 			return entity;
@@ -65,9 +78,12 @@ namespace SeaBattle.Infrastructure.Repositories
 			entities.Remove(GetById(id));
 		}
 
-		public void Save()
+		private void ResetNextId()
 		{
-			_context.SaveChanges();
+			if (entities.Count != 0)
+			{
+				nextId = entities.Max(e => e.Id) + 1;
+			}
 		}
 	}
 }

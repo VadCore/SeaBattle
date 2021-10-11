@@ -1,4 +1,5 @@
-﻿using SeaBattle.Application.Services.Interfaces;
+﻿using Microsoft.Extensions.Configuration;
+using SeaBattle.Application.Services.Interfaces;
 using SeaBattle.Domain.Common;
 using SeaBattle.Domain.Enums;
 using System;
@@ -15,13 +16,19 @@ namespace SeaBattle.UI
 		private readonly IPlayerService _playerService;
 		private readonly IShipService _shipService;
 		private readonly IBattleAbilityService _battleAbilityService;
+		private readonly IConfiguration _configuration;
 
-		public Application(IBoardService boardService, IPlayerService playerService, IShipService shipService, IBattleAbilityService battleAbilityService)
+		public Application(IBoardService boardService,
+						   IPlayerService playerService,
+						   IShipService shipService, 
+						   IBattleAbilityService battleAbilityService, 
+						   IConfiguration configuration)
 		{
 			_boardService = boardService;
 			_playerService = playerService;
 			_shipService = shipService;
 			_battleAbilityService = battleAbilityService;
+			_configuration = configuration;
 		}
 
 		public void Run()

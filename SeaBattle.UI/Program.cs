@@ -7,35 +7,58 @@ using SeaBattle.Infrastructure;
 using SeaBattle.Infrastructure.Data;
 using SeaBattle.Infrastructure.Interfaces;
 using SeaBattle.Infrastructure.Repositories;
+using SeaBattle.UI.Configs;
+using Microsoft.Extensions.Configuration;
 using System;
+using Microsoft.Extensions.Options;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using System.Reflection;
 
 namespace SeaBattle.UI
 {
     class Program
     {
-		string connectionString = "Server=(localdb)\\mssqllocaldb;Database=SeaBattleTestDB1;Trusted_Connection=True;";
+
 		static void Main(string[] args)
 		{
+
+			var builder = new ConfigurationBuilder()
+				.SetBasePath(Directory.GetCurrentDirectory())
+				.AddJsonFile("appsettings.json", optional: false);
+
+			var Configuration = builder.Build();
+
+			var SomePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+		
+
 			var host = Host.CreateDefaultBuilder()
 				.ConfigureServices((context, services) =>
 				{
-					services.AddScoped(typeof(IDataHandler<>), typeof(DataHandler<>));
+					services.AddSingleton<IConfiguration>(provider => Configuration);
 
-					services.AddScoped<IDataContext>(options =>
-					{
-						var dataHandler = ((IDataHandler<SeaBattleContext>)options.GetService(typeof(IDataHandler<SeaBattleContext>)));
-						var context = dataHandler.Load();
 
-						if (context is null)
-						{
-							context = new SeaBattleContext(dataHandler);
-						}
-
-						return context;
-					});
+					services.Configure<AppOptions>(Configuration.GetSection(nameof(AppOptions)));
+					services.AddSingleton<IAppOptions>(options => options.GetService<IOptions<AppOptions>>().Value);
 
 					services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-					services.AddScoped<IUnitOfWork, UnitOfWork>();
+					//services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+					services.AddScoped<IDataHandler, DataHandler>();
+
+					services.AddScoped<IUnitOfWork>(options =>
+					{
+						var dataHandler = ((IDataHandler)options.GetService(typeof(IDataHandler)));
+						var unitOfWork = dataHandler.Load();
+
+						if (unitOfWork is null)
+						{
+							unitOfWork = new UnitOfWork(dataHandler);
+						}
+
+						return unitOfWork;
+					});
 
 					services.AddScoped<IBoardService, BoardService>();
 					services.AddScoped<IPlayerService, PlayerService>();
@@ -43,6 +66,8 @@ namespace SeaBattle.UI
 					services.AddScoped<ISupportAbilityService, SupportAbilityService>();
 					services.AddScoped<IBattleAbilityService, BattleAbilityService>();
 				}).Build();
+
+			
 
 			ActivatorUtilities.CreateInstance<Application>(host.Services).Run();
 		}

@@ -1,4 +1,5 @@
-﻿using SeaBattle.Domain.Common;
+﻿using SeaBattle.Application.Services.Interfaces;
+using SeaBattle.Domain.Common;
 using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
 using System;
@@ -11,17 +12,20 @@ namespace SeaBattle.Application.Services
 {
     public abstract class AbilityService<TAbility> : BaseService<TAbility> where TAbility : Ability
     {
-        protected AbilityService(IUnitOfWork unitOfWork) : base(unitOfWork)
+        private readonly IShipService _shipService;
+
+        protected AbilityService(IUnitOfWork unitOfWork, IShipService shipService) : base(unitOfWork)
         {
+            _shipService = shipService;
         }
 
         protected Ship GetTargetShip(Ship shipFrom, Coordinate coordinate)
         {
-            var size = _unitOfWork.Sizes.GetById(shipFrom.SizeId);
             var player = _unitOfWork.Players.GetById(shipFrom.PlayerId);
             var board = _unitOfWork.Boards.GetById(player.BoardId);
+            var size = _unitOfWork.Sizes.GetById(shipFrom.SizeId);
 
-            if (shipFrom.CalculateDistance(coordinate, size.Length) > size.Range)
+            if (_shipService.CalculateDistanceFromNearestPoint(shipFrom, size, coordinate) > size.Range)
             {
                 return null;
             }

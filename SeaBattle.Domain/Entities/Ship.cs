@@ -16,15 +16,17 @@ namespace SeaBattle.Domain.Entities
 		public int PlayerId { get; init; }
 		public int SizeId { get; init; }
 		public int Health { get => health; set => health = value; }
-		public Coordinate Coordinate { get; set; }
+		public int CenterCoordinateShipId { get; set; }
 		public Rotation Rotation { get; set; }
 		public int NextTurn { get; set; }
 
-		public Player Player { get; set; }
-		public Size Size { get; set; }
-		public IList<CoordinateShip> CoordinateShips { get; set; } = new List<CoordinateShip>();
-		public BattleAbility BattleAbility { get; set; }
-		public SupportAbility SupportAbility { get; set; }
+		//public Player Player { get; set; }
+		//public Size Size { get; set; }
+
+		//public CoordinateShip CenterCoordinateShip { get; set; }
+		//public IList<CoordinateShip> CoordinateShips { get; set; } = new List<CoordinateShip>();
+		//public BattleAbility BattleAbility { get; set; }
+		//public SupportAbility SupportAbility { get; set; }
 
 		public Ship(int sizeId, int playerId, int health)
 		{
@@ -37,25 +39,8 @@ namespace SeaBattle.Domain.Entities
 		{
 		}
 
-		public int CalculateDistance(Coordinate to, int length)
-		{
-			var from = Coordinate;
 
-			var step = Vector2D.Create(Rotation);
 
-			from -= (length / 2) * step;
-
-			int distanceMin = int.MaxValue;
-
-			for (int i = length; i > 0; i--)
-			{
-				distanceMin = Math.Min(from.CalculateDistance(to), distanceMin);
-
-				from += step;
-			}
-
-			return distanceMin;
-		}
 
 		public void Damage(int damage)
 		{
@@ -63,9 +48,9 @@ namespace SeaBattle.Domain.Entities
 
 		}
 
-		public void Heal(int healShot)
+		public void Heal(int healShot, int healthMax)
 		{
-			health = Math.Max(Health + healShot, Size.HealthMax);
+			health = Math.Max(Health + healShot, healthMax);
 		}
 	}
 }

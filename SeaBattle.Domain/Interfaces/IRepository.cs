@@ -23,7 +23,5 @@ namespace SeaBattle.Domain.Interfaces
 		public void Delete(TEntity entity);
 
 		public void Delete(int id);
-
-		public void Save();
 	}
 }

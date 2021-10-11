@@ -85,34 +85,44 @@ namespace SeaBattle.Application.Services
 				return false;
 			}
 
+			
+
 			var step = Vector2D.Create(targetRotation);
 
-			to -= (length / 2) * step;
+			var coordinate = to - (length / 2) * step;
 
 			for (int i = 0; i < length; i++)
 			{
-				var toCoordinateShip = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-																				&& cs.Coordinate == to);
-				if (toCoordinateShip.ShipId != 0 && toCoordinateShip.ShipId != ship.Id)
+				var coordinateShip = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																				&& cs.Coordinate == coordinate);
+				if (coordinateShip.ShipId != 0 && coordinateShip.ShipId != ship.Id)
 				{
 					for (i--; i >= 0; i--)
 					{
-						to -= step;
-						_unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-																 && cs.Coordinate == to).ShipId = 0;
+						coordinate -= step;
+						coordinateShip = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																 && cs.Coordinate == coordinate);
+
+						coordinateShip.ShipId = 0;
+
+						coordinateShip.Ship = null;
 					}
 
 					return false;
 				}
 
-				_unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-														 && cs.Coordinate == to).ShipId = ship.Id;
 
-				to += step;
+				coordinateShip.ShipId = ship.Id;
+
+				coordinateShip.Ship = ship;
+
+				coordinate += step;
 			}
 
-			ship.Coordinate = to;
 			ship.Rotation = targetRotation;
+
+			ship.CenterCoordinateShipId = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																				&& cs.Coordinate == to).Id;
 
 			return true;
 		}
@@ -125,8 +135,12 @@ namespace SeaBattle.Application.Services
 
 			for (int i = length; i > 0; i--)
 			{
-				_unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-														 && cs.Coordinate == from).ShipId = 0;
+				var cooridnateShip = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
+														 && cs.Coordinate == from);
+
+				cooridnateShip.ShipId = 0;
+
+				cooridnateShip.Ship = null;
 
 				from += step;
 			}
@@ -134,7 +148,9 @@ namespace SeaBattle.Application.Services
 
 		public void Dislocate(Ship ship, int length, Board board)
 		{
-			Dislocate(ship, length, board, ship.Coordinate);
+			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+
+			Dislocate(ship, length, board, centralCoordinate);
 		}
 
 		public void Dislocate(Ship ship)
@@ -143,7 +159,9 @@ namespace SeaBattle.Application.Services
 			var player = _unitOfWork.Players.GetById(ship.PlayerId);
 			var board = _unitOfWork.Boards.GetById(player.BoardId);
 
-			Dislocate(ship, size.Length, board, ship.Coordinate);
+			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+
+			Dislocate(ship, size.Length, board, centralCoordinate);
 		}
 
 		public bool Relocate(Ship ship, Coordinate to, Rotation targetRotation)
@@ -152,8 +170,9 @@ namespace SeaBattle.Application.Services
 			var player = _unitOfWork.Players.GetById(ship.PlayerId);
 			var board = _unitOfWork.Boards.GetById(player.BoardId);
 
+			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
 
-			if (ship.Coordinate.CalculateDistance(to) > size.Speed)
+			if (centralCoordinate.CalculateDistance(to) > size.Speed)
 			{
 				return false;
 			}
@@ -164,7 +183,7 @@ namespace SeaBattle.Application.Services
 
 			if (!Allocate(ship, size.Length, board, to, targetRotation))
 			{
-				Allocate(ship, size.Length, board, ship.Coordinate, currentRotation);
+				Allocate(ship, size.Length, board, centralCoordinate, currentRotation);
 
 				return false;
 			}
@@ -179,7 +198,30 @@ namespace SeaBattle.Application.Services
 
 		public bool Rotate(Ship ship, Rotation targetRotation)
 		{
-			return Relocate(ship, ship.Coordinate, targetRotation);
+			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+
+			return Relocate(ship, centralCoordinate, targetRotation);
+		}
+
+		public int CalculateDistanceFromNearestPoint(Ship ship, Size shipSize, Coordinate to)
+		{
+
+			var from = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+
+			var step = Vector2D.Create(ship.Rotation);
+
+			from -= (shipSize.Length / 2) * step;
+
+			int distanceMin = int.MaxValue;
+
+			for (int i = shipSize.Length; i > 0; i--)
+			{
+				distanceMin = Math.Min(from.CalculateDistance(to), distanceMin);
+
+				from += step;
+			}
+
+			return distanceMin;
 		}
 
 	}

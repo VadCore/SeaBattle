@@ -1,4 +1,4 @@
-﻿using SeaBattle.Infrastructure.Common;
+﻿using SeaBattle.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Interfaces
 {
-    public interface IDataHandler<TContext> where TContext : DataContext<TContext>
+    public interface IDataHandler
     {
-        public void SaveContext(TContext context);
+        public void SaveContext(IUnitOfWork unitOfWork);
 
-        public TContext Load();
+        public IUnitOfWork Load();
     }
 }

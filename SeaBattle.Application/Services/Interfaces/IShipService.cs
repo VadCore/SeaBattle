@@ -24,5 +24,7 @@ namespace SeaBattle.Application.Services.Interfaces
 		public bool Rotate(Ship ship, Rotation targetRotation);
 
 		public void Dislocate(Ship ship);
+
+		public int CalculateDistanceFromNearestPoint(Ship ship, Size shipSize, Coordinate to);
 	}
 }

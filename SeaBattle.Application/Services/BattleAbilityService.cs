@@ -14,7 +14,7 @@ namespace SeaBattle.Application.Services
 	{
 		private readonly IShipService _shipService;
 
-		public BattleAbilityService(IUnitOfWork unitOfWork, IShipService shipService) : base(unitOfWork)
+		public BattleAbilityService(IUnitOfWork unitOfWork, IShipService shipService) : base(unitOfWork, shipService)
 		{
 			_shipService = shipService;
 		}

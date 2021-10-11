@@ -14,7 +14,7 @@ namespace SeaBattle.Application.Services
 	{
 		private readonly IShipService _shipService;
 
-		public SupportAbilityService(IUnitOfWork unitOfWork, IShipService shipService) : base(unitOfWork)
+		public SupportAbilityService(IUnitOfWork unitOfWork, IShipService shipService) : base(unitOfWork, shipService)
 		{
 			_shipService = shipService;
 		}
@@ -22,6 +22,7 @@ namespace SeaBattle.Application.Services
 		public bool Repair(Ship ship, Coordinate coordinate)
 		{
 			var supportAbility = _unitOfWork.SupportAbilities.FindFirst(ba => ba.ShipId == ship.Id);
+			var size = _unitOfWork.Sizes.GetById(ship.SizeId);
 
 			if (!StartReloading(ship, supportAbility))
 			{
@@ -35,9 +36,9 @@ namespace SeaBattle.Application.Services
 				return false;
 			}
 
-			var size = _unitOfWork.Sizes.GetById(ship.SizeId);
+			size = _unitOfWork.Sizes.GetById(ship.SizeId);
 
-			targetShip.Heal(size.HealShot);
+			targetShip.Heal(size.HealShot, size.HealthMax);
 
 			return true;
 		}

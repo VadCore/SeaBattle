@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
-using SeaBattle.Infrastructure.Common;
+using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure.Interfaces;
+using SeaBattle.Infrastructure.Repositories;
+using SeaBattle.UI.Configs;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,9 +14,11 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Data
 {
-    public class DataHandler<TContext> : IDataHandler<TContext> where TContext : DataContext<TContext>
+    public class DataHandler : IDataHandler
     {
-        private static readonly string path = @"..\..\..\..\SeaBattle.Infrastructure\Data\SaveData.json";
+        //private static readonly string path = @"..\..\..\..\SeaBattle.Infrastructure\Data\SaveData.json";
+
+        public IAppOptions _appOptions;
 
         private static JsonSerializerSettings settings = new JsonSerializerSettings
         {
@@ -25,32 +29,36 @@ namespace SeaBattle.Infrastructure.Data
             ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver()
         };
 
-
-        public void SaveContext(TContext context)
+        public DataHandler(IAppOptions appOptions)
         {
-            string serializedContext = JsonConvert.SerializeObject(context, settings);
-
-            File.WriteAllText(path, serializedContext, Encoding.UTF8);
+            _appOptions = appOptions;
         }
 
-        public TContext Load()
+        public void SaveContext(IUnitOfWork unitOfWork)
+        {
+            string serializedContext = JsonConvert.SerializeObject(unitOfWork, settings);
+
+            File.WriteAllText(_appOptions.JsonDataPath, serializedContext, Encoding.UTF8);
+        }
+
+        public IUnitOfWork Load()
         {
             string serializedContext;
 
-            if (File.Exists(path))
+            if (File.Exists(_appOptions.JsonDataPath))
             {
-                serializedContext = File.ReadAllText(path);
+                serializedContext = File.ReadAllText(_appOptions.JsonDataPath);
             }
             else
             {
                 return null;
             }
 
-            var context = JsonConvert.DeserializeObject<TContext>(serializedContext, settings);
+            var unitOfWork = JsonConvert.DeserializeObject<UnitOfWork>(serializedContext, settings);
 
-            context.DataHandler = this;
-
-            return context;
+            unitOfWork.DataHandler = this;
+            
+            return unitOfWork;
         }
     }
 }

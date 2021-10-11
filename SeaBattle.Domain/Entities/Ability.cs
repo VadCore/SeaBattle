@@ -11,7 +11,7 @@ namespace SeaBattle.Domain.Entities
         public int ShipId { get; set; }
         public int ReloadTurn { get; set; }
 
-        public Ship Ship { get; set; }
+        //public Ship Ship { get; set; }
 
         public Ability(int shipId)
         {
