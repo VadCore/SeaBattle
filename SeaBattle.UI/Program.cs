@@ -13,6 +13,7 @@ namespace SeaBattle.UI
 {
     class Program
     {
+		string connectionString = "Server=(localdb)\\mssqllocaldb;Database=SeaBattleTestDB1;Trusted_Connection=True;";
 		static void Main(string[] args)
 		{
 			var host = Host.CreateDefaultBuilder()

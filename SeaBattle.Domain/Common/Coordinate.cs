@@ -9,6 +9,23 @@ namespace SeaBattle.Domain.Common
 {
     public class Coordinate : ValueObject<Coordinate>
     {
+        public static readonly int intBitsQuadrantBegin = 2;
+        public static readonly int intBitsQuadrantLength = 2;
+        public static readonly int intBitsQuadrantShift = (32 - intBitsQuadrantBegin) - intBitsQuadrantLength;
+        public static readonly int intBitsQuadrantMask = CreateMask(intBitsQuadrantBegin, intBitsQuadrantLength);
+
+        public static readonly int intBitsXAbsBegin = intBitsQuadrantBegin + intBitsQuadrantLength;
+        public static readonly int intBitsXAbsLength = 14;
+        public static readonly int intBitsXAbsShift = 32 - intBitsXAbsBegin - intBitsXAbsLength;
+        public static readonly int intBitsXAbsMask = CreateMask(intBitsXAbsBegin, intBitsXAbsLength);
+
+        public static readonly int intBitsYAbsBegin = intBitsXAbsBegin + intBitsXAbsLength;
+        public static readonly int intBitsYAbsLength = 14;
+        public static readonly int intBitsYAbsShift = 32 - intBitsYAbsBegin - intBitsYAbsLength;
+        public static readonly int intBitsYAbsMask = CreateMask(intBitsYAbsBegin, intBitsYAbsLength);
+
+
+
         public int Quadrant { get; }
         public int XAbs { get; }
         public int YAbs { get; }
@@ -78,6 +95,17 @@ namespace SeaBattle.Domain.Common
             }
 
             return Math.Max(xDelta, yDelta);
+        }
+
+
+        public int ToInt()
+        {
+            return (Quadrant << intBitsQuadrantShift) | (XAbs << intBitsXAbsShift) | YAbs;
+        }
+
+        private static int CreateMask(int begin, int length)
+        {
+            return (int)(0xFFFFFFFF << begin >> (32 - length) << (32 - length - begin));
         }
     }
 }
