@@ -20,14 +20,6 @@ namespace SeaBattle.Domain.Entities
 		public Rotation Rotation { get; set; }
 		public int NextTurn { get; set; }
 
-		//public Player Player { get; set; }
-		//public Size Size { get; set; }
-
-		//public CoordinateShip CenterCoordinateShip { get; set; }
-		//public IList<CoordinateShip> CoordinateShips { get; set; } = new List<CoordinateShip>();
-		//public BattleAbility BattleAbility { get; set; }
-		//public SupportAbility SupportAbility { get; set; }
-
 		public Ship(int sizeId, int playerId, int health)
 		{
 			SizeId = sizeId;

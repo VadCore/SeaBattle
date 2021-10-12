@@ -12,9 +12,6 @@ namespace SeaBattle.Domain.Entities
         public string Nick { get; set; }
         public int ActiveUnitsCount { get; set; }
 
-        //public Board Board { get; set; }
-        //public IList<Ship> Ships { get; set; } = new List<Ship>();
-
         public Player(string nick, int boardId)
         {
             Nick = nick;

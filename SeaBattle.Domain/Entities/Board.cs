@@ -17,7 +17,6 @@ namespace SeaBattle.Domain.Entities
         public int Turn { get; set; }
         public int TurnPlayerId { get; set; }
 
-        //public IList<Player> Players { get; set; } = new List<Player>();
         public IList<CoordinateShip> CoordinateShips => coordinateShips ??= new List<CoordinateShip>();
         private IList<CoordinateShip> coordinateShips;
         public Board(int xAbsMax, int yAbsMax)

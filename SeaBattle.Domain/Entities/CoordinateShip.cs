@@ -12,8 +12,6 @@ namespace SeaBattle.Domain.Entities
         public int BoardId { get; set; }
         public Coordinate Coordinate { get; set; }
         public int ShipId { get; set; }
-
-        //public Board Board { get; set; }
         public Ship Ship { get; set; }
 
         public CoordinateShip(int boardId, Coordinate coordinate)

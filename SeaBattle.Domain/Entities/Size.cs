@@ -16,7 +16,5 @@ namespace SeaBattle.Domain.Entities
 		public int Reloading { get; set; }
 		public int DamageShot { get; set; }
 		public int HealShot { get; set; }
-
-		//public IList<Ship> Ships { get; set; } = new List<Ship>();
 	}
 }
