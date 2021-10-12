@@ -11,11 +11,9 @@ namespace SeaBattle.Domain.Entities
 {
 	public class Ship : BaseEntity
 	{
-		private int health;
-
 		public int PlayerId { get; init; }
 		public int SizeId { get; init; }
-		public int Health { get => health; set => health = value; }
+		public int Health { get; set; }
 		public int CenterCoordinateShipId { get; set; }
 		public Rotation Rotation { get; set; }
 		public int NextTurn { get; set; }
@@ -24,7 +22,7 @@ namespace SeaBattle.Domain.Entities
 		{
 			SizeId = sizeId;
 			PlayerId = playerId;
-			this.health = health;
+			Health = health;
 		}
 
 		public Ship()
@@ -36,13 +34,13 @@ namespace SeaBattle.Domain.Entities
 
 		public void Damage(int damage)
 		{
-			health -= damage;
+			Health -= damage;
 
 		}
 
 		public void Heal(int healShot, int healthMax)
 		{
-			health = Math.Max(Health + healShot, healthMax);
+			Health = Math.Max(Health + healShot, healthMax);
 		}
 	}
 }

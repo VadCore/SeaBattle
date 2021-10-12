@@ -20,14 +20,5 @@ namespace SeaBattle.Domain.Extensions
                 throw new ArgumentException(string.Format($"Value must be between {0} and {1}", min, max));
             }
         }
-
-        public static Coordinate ToCoordinate(this int from)
-        {
-            var quadrant = (from & Coordinate.intBitsQuadrantMask) >> Coordinate.intBitsQuadrantShift;
-            var xAbs = (from & Coordinate.intBitsXAbsMask) >> Coordinate.intBitsXAbsShift;
-            var yAbs = (from & Coordinate.intBitsYAbsMask) >> Coordinate.intBitsYAbsShift;
-
-            return new Coordinate(quadrant, xAbs, yAbs);
-        }
     }
 }

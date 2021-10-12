@@ -16,8 +16,6 @@ namespace SeaBattle.Infrastructure.Data
 {
     public class DataHandler : IDataHandler
     {
-        //private static readonly string path = @"..\..\..\..\SeaBattle.Infrastructure\Data\SaveData.json";
-
         public IAppOptions _appOptions;
 
         private static JsonSerializerSettings settings = new JsonSerializerSettings
