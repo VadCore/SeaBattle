@@ -10,8 +10,6 @@ namespace SeaBattle.Domain.Entities
     public class Board : BaseEntity
     {
         public const int Quadrants = 4;
-        
-
         public int XAbsMax { get; set; }
         public int YAbsMax { get; set; }
         public int Turn { get; set; }
