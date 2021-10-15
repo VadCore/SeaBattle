@@ -11,15 +11,15 @@ namespace SeaBattle.Application.Services
 {
     public class PlayerService : BaseService<Player>, IPlayerService
     {
-        public PlayerService(IUnitOfWork unitOfWork) : base(unitOfWork)
+        public PlayerService(IRepository<Player> players) : base(players)
         {
         }
 
         public Player Create(string nick, Board board)
         {
-            var player = _unitOfWork.Players.Add(new Player(nick, board.Id));
+            var player = _entities.Add(new Player(nick, board.Id));
 
-            _unitOfWork.Commit();
+            _entities.SaveChanges();
 
             return player;
         }

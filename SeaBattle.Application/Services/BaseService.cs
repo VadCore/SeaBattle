@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Application.Services
 {
-	public abstract class BaseService<TEntity> where TEntity : BaseEntity
-	{
-		protected readonly IUnitOfWork _unitOfWork;
+    public abstract class BaseService<TEntity> where TEntity : BaseEntity
+    {
+        protected readonly IRepository<TEntity> _entities;
 
-		public BaseService(IUnitOfWork unitOfWork)
-		{
-			_unitOfWork = unitOfWork;
-		}
-	}
+        public BaseService(IRepository<TEntity> entities)
+        {
+            _entities = entities;
+        }
+    }
 }

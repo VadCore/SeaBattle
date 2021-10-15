@@ -11,70 +11,68 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Repositories
 {
-	public class ORMRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
+	public class ORMRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity, new()
 	{
 
 		protected readonly ORMSet<TEntity> entities;
-		protected readonly SeaBattleContext _context;
+		protected readonly IUnitOfWork _unitOfWork;
+
 
 		public ORMRepository(SeaBattleContext context)
 		{
-			_context = context;
-			entities = _context.Set<TEntity>();
+			_unitOfWork = (IUnitOfWork)context;
+			entities = context.Set<TEntity>();
 		}
 
 		public TEntity Add(TEntity entity)
 		{
-			entity.Id = nextId++;
-
-			entities.Add(entity);
-
-			return entity;
+			return entities.Add(entity);
 		}
 
 		public TEntity GetById(int id)
 		{
-			var sdf = entities.FirstOrDefault(e => e.Id == id);
-			return entities.FirstOrDefault(e => e.Id == id);
+			return entities.GetById(id);
 		}
 
 		public IReadOnlyCollection<TEntity> GetAll()
 		{
-			return (IReadOnlyCollection<TEntity>)entities;
+			return (IReadOnlyCollection<TEntity>)entities.GetAll();
 		}
 
-		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate)
-		{
-			return entities.FirstOrDefault(predicate.Compile());
-		}
+        public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate)
+        {
+			return null;
 
-		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
-		{
-			return entities.Where(predicate.Compile());
-		}
+            //return entities.FirstOrDefault(predicate.Compile());
+        }
 
-		public void Update(TEntity entity)
+        public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
+        {
+			return null;
+
+			//return entities.Where(predicate.Compile());
+        }
+
+        public void Update(TEntity entity)
 		{
-			entities[entities.IndexOf(GetById(entity.Id))] = entity;
+			entities.Update(entity);
 		}
 
 		public void Delete(TEntity entity)
 		{
-			entities.Remove(entity);
-			entities[entities.IndexOf(GetById(entity.Id))] = entity;
+			entities.Delete(entity);
 		}
 
 		public void Delete(int id)
 		{
-			entities.Remove(GetById(id));
+			entities.Delete(id);
 		}
 
-		private void ResetNextId()
-		{
-			if (entities.Count != 0)
-			{
-				nextId = entities.Max(e => e.Id) + 1;
-			}
-		}
-	}
+		
+
+        public void SaveChanges()
+        {
+			_unitOfWork.Commit();
+        }
+    }
 }

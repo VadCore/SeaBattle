@@ -1,5 +1,7 @@
 ﻿using SeaBattle.Domain.Entities;
+using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure.ORM;
+using SeaBattle.UI.Configs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,26 +10,31 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure
 {
-    public class SeaBattleContext : ORMContext<SeaBattleContext>
+    public class SeaBattleContext : ORMContext<SeaBattleContext>, IUnitOfWork
     {
 
-        public DataSet<Board> Boards { get; }
+        public ORMSet<Board> Boards { get; }
 
-            public DataSet<Player> Players { get; }
+        public ORMSet<Player> Players { get; }
 
-            public DataSet<Ship> Ships { get; }
+        public ORMSet<Ship> Ships { get; }
 
-            public DataSet<BattleAbility> BattleAbilities { get; }
+        public ORMSet<BattleAbility> BattleAbilities { get; }
 
-            public DataSet<SupportAbility> SupportAbilities { get; }
+        public ORMSet<SupportAbility> SupportAbilities { get; }
 
-            public DataSet<CoordinateShip> CoordinateShips { get; }
+        public ORMSet<CoordinateShip> CoordinateShips { get; }
 
-            public DataSet<Size> Sizes { get; } //= SeedSizesData();
+        public ORMSet<Size> Sizes { get; }
 
-            public SeaBattleContext(string connectionString) : base(connectionString)
-            {
-            }
+        public SeaBattleContext(IAppOptions options) : base(options.DbConnectionString)
+        {
+        }
+
+        public void Commit()
+        {
+            base.CommitTransaction();
+        }
 
         //public static DataSet<Size> SeedSizesData()
         //    {

@@ -12,13 +12,17 @@ namespace SeaBattle.Application.Services
 {
 	public class BoardService : BaseService<Board>, IBoardService
 	{
-		public BoardService(IUnitOfWork unitOfWork) : base(unitOfWork)
-		{
-		}
 
-		public Board Create(int xAbsMax, int yAbsMax)
+		private readonly IRepository<CoordinateShip> _coordinateShips;
+
+        public BoardService(IRepository<Board> boards, IRepository<CoordinateShip> coordinateShips) : base(boards)
+        {
+            _coordinateShips = coordinateShips;
+        }
+
+        public Board Create(int xAbsMax, int yAbsMax)
 		{
-			var board = _unitOfWork.Boards.Add(new Board(xAbsMax, yAbsMax));
+			var board = _entities.Add(new Board(xAbsMax, yAbsMax));
 
 			for (int q = 0; q < Board.Quadrants; q++)
 			{
@@ -27,13 +31,13 @@ namespace SeaBattle.Application.Services
 					for (int y = 0; y <= yAbsMax; y++)
 					{
 						var coordinateShip = new CoordinateShip(board.Id, new Coordinate(q, x, y));
-						_unitOfWork.CoordinateShips.Add(coordinateShip);
+						_coordinateShips.Add(coordinateShip);
 						board.CoordinateShips.Add(coordinateShip);
 					}
 				}
 			}
 
-			_unitOfWork.Commit();
+			_entities.SaveChanges();
 
 			return board;
 		}

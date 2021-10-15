@@ -41,8 +41,11 @@ namespace SeaBattle.UI
 					services.Configure<AppOptions>(Configuration.GetSection(nameof(AppOptions)));
 					services.AddSingleton<IAppOptions>(options => options.GetService<IOptions<AppOptions>>().Value);
 
-					services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-					services.AddScoped<IUnitOfWork, UnitOfWork>();
+					//services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+					//services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+					services.AddScoped(typeof(IRepository<>), typeof(ORMRepository<>));
+					services.AddScoped<SeaBattleContext>();
 
 					services.AddScoped<IDataHandler, DataHandler>();
 

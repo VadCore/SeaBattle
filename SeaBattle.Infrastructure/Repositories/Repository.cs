@@ -14,13 +14,20 @@ namespace SeaBattle.Infrastructure.Repositories
 	{
 		private static int nextId = 1;
 
+		public IUnitOfWork _unitOfWork;
+
 		private readonly IList<TEntity> entities = new List<TEntity>();
 
-
-		public Repository(IList<TEntity> entities) : this()
+        public Repository(IUnitOfWork unitOfWork)
         {
-            this.entities = entities;
+            _unitOfWork = unitOfWork;
         }
+
+        public Repository(IUnitOfWork unitOfWork, IList<TEntity> entities) : this(unitOfWork)
+
+		{
+            this.entities = entities;
+		}
 
         public Repository()
         {
@@ -83,5 +90,10 @@ namespace SeaBattle.Infrastructure.Repositories
 				nextId = entities.Max(e => e.Id) + 1;
 			}
 		}
+
+		public void SaveChanges()
+        {
+			_unitOfWork.Commit();
+        }
 	}
 }

@@ -16,25 +16,25 @@ namespace SeaBattle.Infrastructure.Repositories
         [JsonIgnore]
         public IDataHandler DataHandler { get; set; }
 
-        public IRepository<Board> Boards => _boards ??= new Repository<Board>();
+        public IRepository<Board> Boards => _boards ??= new Repository<Board>(this);
         private IRepository<Board> _boards;
 
-        public IRepository<Player> Players => _players ??= new Repository<Player>();
+        public IRepository<Player> Players => _players ??= new Repository<Player>(this);
         private IRepository<Player> _players;
 
-        public IRepository<Ship> Ships => _ships ??= new Repository<Ship>();
+        public IRepository<Ship> Ships => _ships ??= new Repository<Ship>(this);
         private IRepository<Ship> _ships;
 
-        public IRepository<BattleAbility> BattleAbilities => _battleAbilities ??= new Repository<BattleAbility>();
+        public IRepository<BattleAbility> BattleAbilities => _battleAbilities ??= new Repository<BattleAbility>(this);
         private IRepository<BattleAbility> _battleAbilities;
 
-        public IRepository<SupportAbility> SupportAbilities => _supportAbilities ??= new Repository<SupportAbility>();
+        public IRepository<SupportAbility> SupportAbilities => _supportAbilities ??= new Repository<SupportAbility>(this);
         private IRepository<SupportAbility> _supportAbilities;
 
-        public IRepository<CoordinateShip> CoordinateShips => _coordinateships ??= new Repository<CoordinateShip>();
+        public IRepository<CoordinateShip> CoordinateShips => _coordinateships ??= new Repository<CoordinateShip>(this);
         private IRepository<CoordinateShip> _coordinateships;
 
-        public IRepository<Size> Sizes => _sizes ??= new Repository<Size>(SeedSizesData());
+        public IRepository<Size> Sizes => _sizes ??= new Repository<Size>(this, SeedSizesData());
         private IRepository<Size> _sizes;
 
         public UnitOfWork(IDataHandler dataHandler)

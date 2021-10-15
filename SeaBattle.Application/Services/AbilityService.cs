@@ -12,25 +12,35 @@ namespace SeaBattle.Application.Services
 {
     public abstract class AbilityService<TAbility> : BaseService<TAbility> where TAbility : Ability
     {
-        private readonly IShipService _shipService;
+        protected readonly IRepository<Player> _players;
+        protected readonly IRepository<Board> _boards;
+        protected readonly IRepository<Size> _sizes;
+        protected readonly IShipService _shipService;
+        protected readonly IRepository<CoordinateShip> _coordinateShips;
+        protected readonly IRepository<Ship> _ships;
 
-        protected AbilityService(IUnitOfWork unitOfWork, IShipService shipService) : base(unitOfWork)
+        protected AbilityService(IRepository<TAbility> entities, IRepository<Player> players, IRepository<Board> boards, IRepository<Size> sizes, IShipService shipService, IRepository<Ship> ships, IRepository<CoordinateShip> coordinateShips) : base(entities)
         {
+            _players = players;
+            _boards = boards;
+            _sizes = sizes;
             _shipService = shipService;
+            _ships = ships;
+            _coordinateShips = coordinateShips;
         }
 
         protected Ship GetTargetShip(Ship shipFrom, Coordinate coordinate)
         {
-            var player = _unitOfWork.Players.GetById(shipFrom.PlayerId);
-            var board = _unitOfWork.Boards.GetById(player.BoardId);
-            var size = _unitOfWork.Sizes.GetById(shipFrom.SizeId);
+            var player = _players.GetById(shipFrom.PlayerId);
+            var board = _boards.GetById(player.BoardId);
+            var size = _sizes.GetById(shipFrom.SizeId);
 
             if (_shipService.CalculateDistanceFromNearestPoint(shipFrom, size, coordinate) > size.Range)
             {
                 return null;
             }
 
-            var shipId = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
+            var shipId = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
                                                                      && cs.Coordinate == coordinate).ShipId;
 
             if (shipId == 0)
@@ -38,17 +48,17 @@ namespace SeaBattle.Application.Services
                 return null;
             }
 
-            return _unitOfWork.Ships.GetById(shipId);
+            return _ships.GetById(shipId);
         }
 
         protected bool StartReloading(Ship ship, Ability ability)
         {
-            var player = _unitOfWork.Players.GetById(ship.PlayerId);
-            var board = _unitOfWork.Boards.GetById(player.BoardId);
+            var player = _players.GetById(ship.PlayerId);
+            var board = _boards.GetById(player.BoardId);
 
             if (board.Turn >= ability.ReloadTurn)
             {
-                var size = _unitOfWork.Sizes.GetById(ship.SizeId);
+                var size = _sizes.GetById(ship.SizeId);
                 ability.ReloadTurn = board.Turn + size.Reloading;
             }
             else

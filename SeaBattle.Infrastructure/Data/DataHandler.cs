@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure.Interfaces;
 using SeaBattle.Infrastructure.Repositories;
@@ -53,6 +54,8 @@ namespace SeaBattle.Infrastructure.Data
             }
 
             var unitOfWork = JsonConvert.DeserializeObject<UnitOfWork>(serializedContext, settings);
+
+            
 
             unitOfWork.DataHandler = this;
             

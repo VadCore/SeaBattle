@@ -26,27 +26,21 @@ namespace SeaBattle.Infrastructure.ORM
 
             Connection = new SqlConnection(_connectionString);
 
-            Transaction = Connection.BeginTransaction();
+            Connection.Open();
 
-            foreach (var field in fieldInfos)
-            {
-                if (field.GetValue(this) is null)
-                {
-                    field.SetValue(this, Activator.CreateInstance(field.FieldType, Connection, Transaction));
-                }
-            }
+            Transaction = Connection.BeginTransaction();
         }
 
-        public DataSet<TEntity> Set<TEntity>() where TEntity : BaseEntity
+        public ORMSet<TEntity> Set<TEntity>() where TEntity : BaseEntity, new()
         {
             var field = entityTypeFieldInfo[typeof(TEntity)];
 
             if (field.GetValue(this) is null)
             {
-                field.SetValue(this, Activator.CreateInstance(field.FieldType, Connection, Transaction));
+                field.SetValue(this, Activator.CreateInstance(field.FieldType, Connection, Transaction, field.Name));
             }
 
-            return (DataSet<TEntity>)entityTypeFieldInfo[typeof(TEntity)].GetValue(this);
+            return (ORMSet<TEntity>)entityTypeFieldInfo[typeof(TEntity)].GetValue(this);
         }
 
         private static FieldInfo[] GetFieldInfos()
@@ -67,7 +61,7 @@ namespace SeaBattle.Infrastructure.ORM
             return collectionEntitiesByEntityType;
         }
 
-        public void SaveChanges()
+        protected void CommitTransaction()
         {
             Transaction.Commit();
         }
