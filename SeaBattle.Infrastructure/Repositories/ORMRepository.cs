@@ -1,6 +1,7 @@
 ﻿using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure.Interfaces;
+using SeaBattle.Infrastructure.ORM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,27 +11,19 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Repositories
 {
-	public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
+	public class ORMRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
 	{
-		private static int nextId = 1;
 
-		private readonly IList<TEntity> entities = new List<TEntity>();
+		protected readonly ORMSet<TEntity> entities;
+		protected readonly SeaBattleContext _context;
 
-
-		public Repository(IList<TEntity> entities) : this()
-        {
-            this.entities = entities;
-        }
-
-        public Repository()
-        {
-			if (nextId == 1 && entities.Count != 0)
-			{
-				ResetNextId();
-			}
+		public ORMRepository(SeaBattleContext context)
+		{
+			_context = context;
+			entities = _context.Set<TEntity>();
 		}
 
-        public TEntity Add(TEntity entity)
+		public TEntity Add(TEntity entity)
 		{
 			entity.Id = nextId++;
 

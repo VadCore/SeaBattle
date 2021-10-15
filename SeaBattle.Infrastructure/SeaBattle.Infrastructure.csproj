@@ -13,4 +13,8 @@
     <ProjectReference Include="..\SeaBattle.Domain\SeaBattle.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SQL\" />
+  </ItemGroup>
+
 </Project>
