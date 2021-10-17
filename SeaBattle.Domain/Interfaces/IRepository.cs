@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Interfaces
 {
-	public interface IRepository<TEntity> where TEntity : BaseEntity
+	public interface IRepository<TEntity> where TEntity : BaseEntity<TEntity>
 	{
 		public TEntity Add(TEntity entity);
+
+		public void Add(IEnumerable<TEntity> entities);
 
 		public TEntity GetById(int id);
 

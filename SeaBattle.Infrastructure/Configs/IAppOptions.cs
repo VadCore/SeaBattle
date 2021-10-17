@@ -10,5 +10,6 @@ namespace SeaBattle.UI.Configs
     {
         public string JsonDataPath { get; }
         public string DbConnectionString { get; }
+        public bool IsSerializable { get; }
     }
 }

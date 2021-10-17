@@ -1,4 +1,5 @@
 ﻿using SeaBattle.Domain.Interfaces;
+using SeaBattle.Infrastructure.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Interfaces
 {
-    public interface IDataHandler
+    public interface IDataHandler<TContext> where TContext : SerializationContext<TContext>
     {
-        public void SaveContext(IUnitOfWork unitOfWork);
+        public void SaveContext(TContext context);
 
-        public IUnitOfWork Load();
+        public TContext Load();
     }
 }

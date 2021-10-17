@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
-	public class SupportAbility : Ability
+	public class SupportAbility : Ability<SupportAbility>
 	{
 		public SupportAbility(int shipId) : base(shipId)
 		{

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
-    public class Player : BaseEntity
+    public class Player : BaseEntity<Player>
     {
         public int BoardId { get; set; }
         public string Nick { get; set; }

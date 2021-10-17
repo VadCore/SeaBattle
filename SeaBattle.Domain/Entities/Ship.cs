@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
-	public class Ship : BaseEntity
+	public class Ship : BaseEntity<Ship>
 	{
 		public int PlayerId { get; init; }
 		public int SizeId { get; init; }
@@ -29,9 +29,6 @@ namespace SeaBattle.Domain.Entities
 		{
 		}
 
-
-
-
 		public void Damage(int damage)
 		{
 			Health -= damage;
@@ -42,5 +39,10 @@ namespace SeaBattle.Domain.Entities
 		{
 			Health = Math.Max(Health + healShot, healthMax);
 		}
-	}
+
+   //     public override string ToString()
+   //     {
+			//return string.Format($"PlayerId: {PlayerId}, SizeId: {SizeId}, CenterCoordinateShipId: {CenterCoordinateShipId}");
+   //     }
+    }
 }

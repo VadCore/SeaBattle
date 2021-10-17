@@ -41,10 +41,17 @@ namespace SeaBattle.UI
 
 			_shipService.Relocate(player1BattleMiddleShip, new Coordinate(0, 3, 5), Rotation.Vertical);
 
-			_battleAbilityService.Shot(player2UniversalHugeShip, new Coordinate(0, 3, 6));
+			_battleAbilityService.Shot(player2UniversalHugeShip, new Coordinate(0, 6, 5));
 
+            Console.WriteLine("_boardService.ToString(board)");
+			Console.WriteLine(_boardService.ToString(board));
 
-			Console.WriteLine(board.Id);
+			Console.WriteLine("_boardService.GetShipByIndexator");
+			Console.WriteLine(_boardService.GetShipByIndexator(board, new Coordinate(0, 1, 5)));
+
+			Console.WriteLine("Test");
+
+			Console.ReadKey();
 
 		}
 	}

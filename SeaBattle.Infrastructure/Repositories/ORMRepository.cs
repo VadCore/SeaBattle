@@ -11,61 +11,62 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Repositories
 {
-	public class ORMRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity, new()
+	public class ORMRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity<TEntity>, new()
 	{
 
-		protected readonly ORMSet<TEntity> entities;
+		protected readonly ORMSet<TEntity> _entities;
 		protected readonly IUnitOfWork _unitOfWork;
 
 
-		public ORMRepository(SeaBattleContext context)
+		public ORMRepository(SeaBattleORMContext context)
 		{
 			_unitOfWork = (IUnitOfWork)context;
-			entities = context.Set<TEntity>();
+			_entities = context.Set<TEntity>();
 		}
 
 		public TEntity Add(TEntity entity)
 		{
-			return entities.Add(entity);
+			return _entities.Add(entity);
+		}
+
+		public void Add(IEnumerable<TEntity> entities)
+		{
+			_entities.Add(entities);
 		}
 
 		public TEntity GetById(int id)
 		{
-			return entities.GetById(id);
+			return _entities.GetById(id);
 		}
 
 		public IReadOnlyCollection<TEntity> GetAll()
 		{
-			return (IReadOnlyCollection<TEntity>)entities.GetAll();
+			return (IReadOnlyCollection<TEntity>)_entities.GetAll();
 		}
 
         public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate)
         {
-			return null;
-
-            //return entities.FirstOrDefault(predicate.Compile());
+			return _entities.FindFirst(predicate);
         }
 
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
         {
-			return null;
-
-			//return entities.Where(predicate.Compile());
-        }
+			return _entities.FindAll(predicate);
+		}
 
         public void Update(TEntity entity)
 		{
-			entities.Update(entity);
+			_entities.Update(entity);
 		}
 
 		public void Delete(TEntity entity)
 		{
-			entities.Delete(entity);
+			_entities.Delete(entity);
 		}
 
 		public void Delete(int id)
 		{
-			entities.Delete(id);
+			_entities.Delete(id);
 		}
 
 		

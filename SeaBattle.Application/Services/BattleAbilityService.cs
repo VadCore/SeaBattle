@@ -43,14 +43,21 @@ namespace SeaBattle.Application.Services
 				return false;
 			}
 
+			_entities.Update(battleAbility);
+
 			var size = _sizes.GetById(ship.SizeId);
 
 			targetShip.Damage(size.DamageShot);
 
 			if (targetShip.Health <= 0)
 			{
-				_shipService.Dislocate(targetShip);
+				_shipService.Kill(targetShip);
+                Console.WriteLine(ship.ToString() + " HAS BEEN SUNK");
 			}
+
+			_ships.Update(targetShip);
+
+			_entities.SaveChanges();
 
 			return true;
 		}

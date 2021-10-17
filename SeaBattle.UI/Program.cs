@@ -4,7 +4,7 @@ using SeaBattle.Application.Services;
 using SeaBattle.Application.Services.Interfaces;
 using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure;
-using SeaBattle.Infrastructure.Data;
+
 using SeaBattle.Infrastructure.Interfaces;
 using SeaBattle.Infrastructure.Repositories;
 using SeaBattle.UI.Configs;
@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Reflection;
+using SeaBattle.Infrastructure.Serialization;
 
 namespace SeaBattle.UI
 {
@@ -35,43 +36,40 @@ namespace SeaBattle.UI
 
 			var host = Host.CreateDefaultBuilder()
 				.ConfigureServices((context, services) =>
-				{
-					services.AddSingleton<IConfiguration>(provider => Configuration);
+                {
+                    services.AddSingleton<IConfiguration>(provider => Configuration);
 
-					services.Configure<AppOptions>(Configuration.GetSection(nameof(AppOptions)));
-					services.AddSingleton<IAppOptions>(options => options.GetService<IOptions<AppOptions>>().Value);
+                    services.Configure<AppOptions>(Configuration.GetSection(nameof(AppOptions)));
+                    services.AddSingleton<IAppOptions>(options => options.GetService<IOptions<AppOptions>>().Value);
 
-					//services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-					//services.AddScoped<IUnitOfWork, UnitOfWork>();
+                    if (Configuration.GetValue<bool>("AppOptions:IsSerializable"))
+                    {
+                        var jsonDataPath = Configuration.GetValue<string>("AppOptions:JsonDataPath");
+                        services.AddSerializationContext<SeaBattleSerializationContext>(jsonDataPath);
+                        services.AddScoped(typeof(IRepository<>), typeof(SerializationRepository<>));
+                    }
+                    else
+                    {
+                        services.AddScoped(typeof(IRepository<>), typeof(ORMRepository<>));
+                        services.AddScoped<SeaBattleORMContext>();
+                    }
 
-					services.AddScoped(typeof(IRepository<>), typeof(ORMRepository<>));
-					services.AddScoped<SeaBattleContext>();
 
-					services.AddScoped<IDataHandler, DataHandler>();
 
-					services.AddScoped<IUnitOfWork>(options =>
-					{
-						var dataHandler = ((IDataHandler)options.GetService(typeof(IDataHandler)));
-						var unitOfWork = dataHandler.Load();
 
-						if (unitOfWork is null)
-						{
-							unitOfWork = new UnitOfWork(dataHandler);
-						}
 
-						return unitOfWork;
-					});
-
-					services.AddScoped<IBoardService, BoardService>();
-					services.AddScoped<IPlayerService, PlayerService>();
-					services.AddScoped<IShipService, ShipService>();
-					services.AddScoped<ISupportAbilityService, SupportAbilityService>();
-					services.AddScoped<IBattleAbilityService, BattleAbilityService>();
-				}).Build();
+                    services.AddScoped<IBoardService, BoardService>();
+                    services.AddScoped<IPlayerService, PlayerService>();
+                    services.AddScoped<IShipService, ShipService>();
+                    services.AddScoped<ISupportAbilityService, SupportAbilityService>();
+                    services.AddScoped<IBattleAbilityService, BattleAbilityService>();
+                }).Build();
 
 			
 
 			ActivatorUtilities.CreateInstance<Application>(host.Services).Run();
 		}
-	}
+
+        
+    }
 }

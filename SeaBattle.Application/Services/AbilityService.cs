@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Application.Services
 {
-    public abstract class AbilityService<TAbility> : BaseService<TAbility> where TAbility : Ability
+    public abstract class AbilityService<TAbility> : BaseService<TAbility> where TAbility : Ability<TAbility>
     {
         protected readonly IRepository<Player> _players;
         protected readonly IRepository<Board> _boards;
@@ -40,18 +40,20 @@ namespace SeaBattle.Application.Services
                 return null;
             }
 
-            var shipId = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
-                                                                     && cs.Coordinate == coordinate).ShipId;
+            var shipId = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id &&
+                                                    cs.Quadrant == coordinate.Quadrant
+                                                    && cs.XAbs == coordinate.XAbs
+                                                    && cs.YAbs == cs.YAbs).ShipId;
 
             if (shipId == 0)
             {
                 return null;
             }
 
-            return _ships.GetById(shipId);
+            return _ships.GetById((int)shipId);
         }
 
-        protected bool StartReloading(Ship ship, Ability ability)
+        protected bool StartReloading(Ship ship, Ability<TAbility> ability)
         {
             var player = _players.GetById(ship.PlayerId);
             var board = _boards.GetById(player.BoardId);

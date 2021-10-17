@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
-    public abstract class Ability : BaseEntity
+    public abstract class Ability<TAbility> : BaseEntity<TAbility>
     {
         public int ShipId { get; set; }
         public int ReloadTurn { get; set; }

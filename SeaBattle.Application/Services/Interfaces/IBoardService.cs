@@ -1,4 +1,5 @@
-﻿using SeaBattle.Domain.Entities;
+﻿using SeaBattle.Domain.Common;
+using SeaBattle.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,9 @@ namespace SeaBattle.Application.Services.Interfaces
 	public interface IBoardService
 	{
 		public Board Create(int xAbsMax, int yAbsMax);
+
+		public string ToString(Board board);
+
+		public Ship GetShipByIndexator(Board board, Coordinate coordinate);
 	}
 }

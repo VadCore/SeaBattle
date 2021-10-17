@@ -10,15 +10,21 @@ using System.Text.Json.Serialization;
 
 namespace SeaBattle.Infrastructure.ORM
 {
-    public abstract class ORMContext<TContext> where TContext : ORMContext<TContext>
+    public abstract class ORMContext<TContext> : IORMContext where TContext : ORMContext<TContext>
     {
         private string _connectionString;
         public SqlConnection Connection { get; }
-        public SqlTransaction Transaction { get; }
+        public SqlTransaction Transaction => transaction ??= Connection.BeginTransaction();
+        private SqlTransaction transaction;
+
+        private static readonly PropertyInfo[] propertyInfos = GetPropertyInfos();
+        private readonly IDictionary<Type, PropertyInfo> entityTypePropertyInfos = GetEntityTypePropertyInfos();
 
 
-        private static readonly FieldInfo[] fieldInfos = GetFieldInfos();
-        private readonly IDictionary<Type, FieldInfo> entityTypeFieldInfo = GetEntityTypeFieldInfos();
+        static ORMContext()
+        {
+            GetPropertyInfos();
+        }
 
         public ORMContext(string connectionString)
         {
@@ -28,42 +34,56 @@ namespace SeaBattle.Infrastructure.ORM
 
             Connection.Open();
 
-            Transaction = Connection.BeginTransaction();
+            //transaction = Connection.BeginTransaction();
         }
 
-        public ORMSet<TEntity> Set<TEntity>() where TEntity : BaseEntity, new()
+        public ORMSet<TEntity> Set<TEntity>() where TEntity : BaseEntity<TEntity>, new()
         {
-            var field = entityTypeFieldInfo[typeof(TEntity)];
+            var property = entityTypePropertyInfos[typeof(TEntity)];
 
-            if (field.GetValue(this) is null)
+            if (property.GetValue(this) is null)
             {
-                field.SetValue(this, Activator.CreateInstance(field.FieldType, Connection, Transaction, field.Name));
+                property.SetValue(this, Activator.CreateInstance(property.PropertyType, new object[] { this, property.Name }));
             }
 
-            return (ORMSet<TEntity>)entityTypeFieldInfo[typeof(TEntity)].GetValue(this);
+            return (ORMSet<TEntity>)entityTypePropertyInfos[typeof(TEntity)].GetValue(this);
         }
 
-        private static FieldInfo[] GetFieldInfos()
+        private static PropertyInfo[] GetPropertyInfos()
         {
-            return typeof(TContext).GetFields(ReflectionConstants.PublicInstance).ToArray();
+
+            return typeof(TContext).GetProperties(ReflectionConstants.PublicInstance)
+                .Where(pi => pi.PropertyType.IsGenericType && pi.PropertyType.GetGenericTypeDefinition() == typeof(ORMSet<>)).ToArray();
         }
 
-        private static IDictionary<Type, FieldInfo> GetEntityTypeFieldInfos()
+        private static IDictionary<Type, PropertyInfo> GetEntityTypePropertyInfos()
         {
-            var collectionEntitiesByEntityType = new Dictionary<Type, FieldInfo>();
+            var collectionEntitiesByEntityType = new Dictionary<Type, PropertyInfo>();
 
-            foreach (var field in fieldInfos)
+            foreach (var property in propertyInfos)
             {
-                var type = field.FieldType.GetGenericArguments().FirstOrDefault();
-                collectionEntitiesByEntityType.Add(type, field);
+                var type = property.PropertyType.GetGenericArguments().FirstOrDefault();
+                collectionEntitiesByEntityType.Add(type, property);
             }
 
             return collectionEntitiesByEntityType;
         }
 
-        protected void CommitTransaction()
+        public void Commit()
         {
-            Transaction.Commit();
+            try
+            {
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+            }
+            finally
+            {
+                transaction.Dispose();
+                transaction = null;
+            }
         }
     }
 }

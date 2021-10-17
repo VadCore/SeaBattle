@@ -30,7 +30,7 @@ CREATE TABLE Ships(
 	Id int IDENTITY (1,1) NOT NULL PRIMARY KEY,
 	PlayerId int NOT NULL FOREIGN KEY REFERENCES [Players](Id) ON DELETE CASCADE,
 	SizeId int NOT NULL FOREIGN KEY REFERENCES [Sizes](Id),
-	CenterCoordinateId int NOT NULL,
+	CenterCoordinateShipId int NOT NULL,
 	Health int NOT NULL,
 	Rotation int NOT NULL,
 	NextTurn int NOT NULL
@@ -45,8 +45,8 @@ CREATE TABLE CoordinateShips(
 	ShipId int NULL FOREIGN KEY REFERENCES [Ships](Id) ON DELETE SET NULL,
 )
 
-ALTER TABLE Ships ADD CONSTRAINT FK_Ships_CenterCoordinateId
-   FOREIGN KEY (CenterCoordinateId) REFERENCES CoordinateShips (Id);
+ALTER TABLE Ships ADD CONSTRAINT FK_Ships_CenterCoordinateShipId
+   FOREIGN KEY (CenterCoordinateShipId) REFERENCES CoordinateShips (Id);
 
 CREATE TABLE BattleAbilities(
 	Id int IDENTITY (1,1) NOT NULL PRIMARY KEY,

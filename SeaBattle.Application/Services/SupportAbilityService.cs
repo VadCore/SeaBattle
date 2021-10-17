@@ -44,9 +44,15 @@ namespace SeaBattle.Application.Services
 				return false;
 			}
 
+			_supportAbilities.Update(supportAbility);
+
 			size = _sizes.GetById(ship.SizeId);
 
 			targetShip.Heal(size.HealShot, size.HealthMax);
+
+			_ships.Update(targetShip);
+
+			_entities.SaveChanges();
 
 			return true;
 		}
