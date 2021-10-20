@@ -38,6 +38,7 @@ namespace SeaBattle.Application.Services
 					}
 				}
 			}
+
 			_coordinateShips.Add(board.CoordinateShips);
 
 			_entities.SaveChanges();
@@ -60,7 +61,17 @@ namespace SeaBattle.Application.Services
 
 		private void FillNavigationFields(Board board) 
 		{
-			board.CoordinateShips = _coordinateShips.FindAll(cs => cs.BoardId == board.Id).ToList();
+			//board.CoordinateShips = _coordinateShips.FindAll(cs => cs.BoardId == board.Id).ToList();
+			board = _entities.FindFirst(b => b.Id == board.Id, nameof(Board) + "." + nameof(Board.CoordinateShips));
+			//board = _entities.FindFirst(b => b.Id == board.Id, b=> b.CoordinateShips);
+
+			//board = _entities.FindFirst(b => b.Id == board.Id, nameof(Board) + "." + nameof(Board.CoordinateShips),
+			//												   nameof(CoordinateShip) + "." + nameof(CoordinateShip.Ship));
+
+			//board = _entities.FindFirst(b => b.Id == board.Id, nameof(Board) + "." + nameof(Board.CoordinateShips)
+			//												   + "." + nameof(CoordinateShip.Ship));
+
+			//board = _entities.FindFirst(b => b.Id == board.Id, b => b.CoordinateShips, b=> b.Players);
 
 			var shipIds = board.CoordinateShips.Select(cs => cs.ShipId).Distinct();
 

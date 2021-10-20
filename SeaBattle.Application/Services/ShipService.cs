@@ -98,9 +98,11 @@ namespace SeaBattle.Application.Services
 					_entities.Delete(ship.Id);
 					return null;
 				}
+
+				return ship;
 			}
 
-			return ship;
+			return null;
 		}
 
 
@@ -128,7 +130,8 @@ namespace SeaBattle.Application.Services
                     {
                         for (int k = i - 1; k >= 0; k--)
                         {
-                            coordinate -= step;
+
+                            coordinate -= (to.Quadrant == coordinate.Quadrant) ? step : -step;
                             coordinateShip = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
                                                                         && cs.Quadrant == coordinate.Quadrant
                                                                         && cs.XAbs == coordinate.XAbs
@@ -154,7 +157,7 @@ namespace SeaBattle.Application.Services
 					_coordinateShips.Update(coordinateShip);
                 }
 
-				coordinate += step;
+				coordinate += (to.Quadrant == coordinate.Quadrant) ? step : -step;
 			}
 			if (!isOnlyCheck)
 			{
@@ -176,14 +179,14 @@ namespace SeaBattle.Application.Services
 		{
 			var step = Vector2D.Create(ship.Rotation);
 
-			from -= (length / 2) * step;
+			var coordinate = from - (length / 2) * step;
 
 			for (int i = length; i > 0; i--)
 			{
 				var coordinateShip = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
-																   && cs.Quadrant == from.Quadrant
-																   && cs.XAbs == from.XAbs
-																   && cs.YAbs == from.YAbs);
+																   && cs.Quadrant == coordinate.Quadrant
+																   && cs.XAbs == coordinate.XAbs
+																   && cs.YAbs == coordinate.YAbs);
 
 				coordinateShip.ShipId = null;
 
@@ -191,7 +194,7 @@ namespace SeaBattle.Application.Services
 
 				_coordinateShips.Update(coordinateShip);
 
-				from += step;
+				coordinate += (from.Quadrant == coordinate.Quadrant) ? step : -step;
 			}
 		}
 
@@ -268,6 +271,8 @@ namespace SeaBattle.Application.Services
 
 			var step = Vector2D.Create(ship.Rotation);
 
+
+
 			from -= (shipSize.Length / 2) * step;
 
 			int distanceMin = int.MaxValue;
@@ -276,7 +281,7 @@ namespace SeaBattle.Application.Services
 			{
 				distanceMin = Math.Min(from.CalculateDistance(to), distanceMin);
 
-				from += step;
+				from += (to.Quadrant == from.Quadrant) ? step : -step;
 			}
 
 			return distanceMin;

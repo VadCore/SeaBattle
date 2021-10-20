@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +20,11 @@ namespace SeaBattle.Infrastructure.Serialization
         public int Count => _entities.Count;
 
         public bool IsReadOnly => false;
+
+        public IReadOnlyList<TEntity> AsReadOnly()
+        {
+            return _entities.AsReadOnly();
+        }
 
         public void Add(TEntity item)
         {
@@ -42,14 +48,20 @@ namespace SeaBattle.Infrastructure.Serialization
             return _entities.Contains(item);
         }
 
-        public IReadOnlyList<TEntity> AsReadOnly()
-        {
-            return _entities.AsReadOnly();
-        }
-
         public void CopyTo(TEntity[] array, int arrayIndex)
         {
             _entities.CopyTo(array, arrayIndex);
+        }
+
+        public void Delete(TEntity entity)
+        {
+            _entities.Remove(entity);
+            _entities[_entities.IndexOf(GetById(entity.Id))] = entity;
+        }
+
+        public void Delete(int id)
+        {
+            _entities.Remove(GetById(id));
         }
 
         public IEnumerator<TEntity> GetEnumerator()
@@ -65,6 +77,26 @@ namespace SeaBattle.Infrastructure.Serialization
         public void Insert(int index, TEntity item)
         {
             _entities.Insert(index, item);
+        }
+
+        public void Update(TEntity entity)
+        {
+            _entities[_entities.IndexOf(GetById(entity.Id))] = entity;
+        }
+
+        public TEntity GetById(int id)
+        {
+            return _entities.FirstOrDefault(e => e.Id == id);
+        }
+
+        public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings)
+        {
+            return _entities.FirstOrDefault(predicate.Compile());
+        }
+
+        public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _entities.Where(predicate.Compile());
         }
 
         public bool Remove(TEntity item)

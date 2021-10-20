@@ -44,7 +44,7 @@ namespace SeaBattle.Infrastructure.ORM
         {
             string sqlExpression =
                 $"INSERT INTO {_dbTableTitle} ({string.Join(", ", noPKPropertyTitles)}) " +
-                $"VALUES ({string.Join(", ", noPKPropertyInfos.Select(pi => ConvertToDbValue(pi.GetValue(entity))))}); " +
+                $"VALUES ({string.Join(", ", noPKPropertyInfos.Select(pi => SqlConverter.ConvertToDbValue(pi.GetValue(entity))))}); " +
                 $"SELECT CAST(scope_identity() AS int)";
 
             entity.Id = ExecuteScalar<int>(sqlExpression);
@@ -54,7 +54,7 @@ namespace SeaBattle.Infrastructure.ORM
 
         public void Add(IEnumerable<TEntity> entities)
         {
-            var values = entities.Select(e => $"({string.Join(", ", noPKPropertyInfos.Select(pi => ConvertToDbValue(pi.GetValue(e))))})");
+            var values = entities.Select(e => $"({string.Join(", ", noPKPropertyInfos.Select(pi => SqlConverter.ConvertToDbValue(pi.GetValue(e))))})");
 
             string sqlExpression =
                 $"INSERT INTO {_dbTableTitle} ({string.Join(", ", noPKPropertyTitles)}) " +
@@ -82,137 +82,39 @@ namespace SeaBattle.Infrastructure.ORM
             return ExecuteReaderCollectionEntities(sqlExpression);
         }
 
-
-        private class ExpressionToSqlConverter : ExpressionVisitor
+        public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings) // "Board.CoordinateShips"
         {
-            private readonly StringBuilder buffer = new();
+            var sqlConverter = new SqlConverter(_oRMContext);
 
-            public string Convert<T>(Expression<T> expression)
-            {
-                Visit(expression);
-
-                return buffer.ToString();
-            }
-
-            public override Expression Visit(Expression node)
-            {
-                return base.Visit(node);
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if(node.Expression.NodeType == ExpressionType.Parameter)
-                {
-                    buffer.Append(node.Member.Name);
-                    return node;
-                }
-                else if (node.Expression.NodeType == ExpressionType.Constant)
-                {
-                    var constantExpression = ((ConstantExpression)(node.Expression)).Value;
-
-                    var constant = node.Member.MemberType switch
-                    {
-                        MemberTypes.Field => ((FieldInfo)node.Member).GetValue(constantExpression),
-                        MemberTypes.Property => ((PropertyInfo)node.Member).GetValue(constantExpression),
-                        _ => throw new ArgumentException("Unknown members type for constants!")
-                    };
-
-                    buffer.Append(ConvertToDbValue(constant));
-                    return node;
-                }
-                else if (node.Expression.NodeType == ExpressionType.MemberAccess
-                    && node.Expression is MemberExpression embeddedNode
-                    && embeddedNode.Expression.NodeType == ExpressionType.Constant)
-                {
-
-
-                    var constantExpression = ((ConstantExpression)(embeddedNode.Expression)).Value;
-
-                    var embeddedConstant = embeddedNode.Member.MemberType switch
-                    {
-                        MemberTypes.Field => ((FieldInfo)embeddedNode.Member).GetValue(constantExpression),
-                        MemberTypes.Property => ((PropertyInfo)embeddedNode.Member).GetValue(constantExpression),
-                        _ => throw new ArgumentException("Unknown members type for constants!")
-                    };
-
-                    var constant = node.Member.MemberType switch
-                    {
-                        MemberTypes.Field => ((FieldInfo)node.Member).GetValue(embeddedConstant),
-                        MemberTypes.Property => ((PropertyInfo)node.Member).GetValue(embeddedConstant),
-                        _ => throw new ArgumentException("Unknown members type for constants!")
-                    };
-
-                    buffer.Append(ConvertToDbValue(constant));
-                    return node;
-                }
-
-                return base.VisitMember(node);
-            }
-
-            protected override Expression VisitBinary(BinaryExpression binary)
-            {
-                buffer.Append('(');
-                Visit(binary.Left);
-
-                var operatorTitle = binary.NodeType switch
-                {
-                    ExpressionType.AndAlso => "AND",
-                    ExpressionType.OrElse => "OR",
-                    ExpressionType.Equal => "=",
-                    ExpressionType.NotEqual => "!=",
-                    _ => throw new ArgumentException("Unknown binary operator for ExpressionVisitor!")
-                };
-
-                buffer.Append(" " + operatorTitle + " ");
-
-                Visit(binary.Right);
-                buffer.Append(')');
-
-                return binary;
-            }
-        }
-
-
-
-        public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate)
-        {
-            var sqlConverter = new ExpressionToSqlConverter();
-
+            var joinString = string.Join(" ", includeStrings.Select(i=> $"JOIN {_oRMContext.NavigationTableTitleByNavigationIncludes[i]} " +
+                                                                        $"ON {_oRMContext.FkBindingByNavigationIncludes[i]} "));
+           
             string sqlExpression =
                 $"SELECT * " +
                 $"FROM {_dbTableTitle} " +
-                $"WHERE {sqlConverter.Convert(predicate)}";
+                $"{joinString}" +
+                $"WHERE {sqlConverter.ConvertFromExpression(predicate)}";
 
             return ExecuteReaderEntity(sqlExpression);
         }
 
-
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
         {
-            var sqlConverter = new ExpressionToSqlConverter();
+            var sqlConverter = new SqlConverter(_oRMContext);
 
             string sqlExpression =
                 $"SELECT * " +
                 $"FROM {_dbTableTitle} " +
-                $"WHERE {sqlConverter.Convert(predicate)}";
+                $"WHERE {sqlConverter.ConvertFromExpression(predicate)}";
 
             return ExecuteReaderCollectionEntities(sqlExpression);
         }
-
-
-
-
-
-
-
-
-
 
         public void Update(TEntity entity)
         {
             string sqlExpression =
                 $"UPDATE {_dbTableTitle} " +
-                $"SET {string.Join(", ", noPKPropertyInfoByPropertyTitles.Select(pi => $"{pi.Key} = {ConvertToDbValue(pi.Value.GetValue(entity))}" ))} " +
+                $"SET {string.Join(", ", noPKPropertyInfoByPropertyTitles.Select(pi => $"{pi.Key} = {SqlConverter.ConvertToDbValue(pi.Value.GetValue(entity))}" ))} " +
                 $"WHERE Id = {entity.Id}";
 
             ExecuteNonQuery(sqlExpression);
@@ -233,9 +135,6 @@ namespace SeaBattle.Infrastructure.ORM
             ExecuteNonQuery(sqlExpression);
         }
 
-        
-
-
         public void ExecuteNonQuery(string sqlExpression)
         {
             var command = new SqlCommand(sqlExpression, _connection);
@@ -243,7 +142,6 @@ namespace SeaBattle.Infrastructure.ORM
 
             command.ExecuteNonQuery();
         }
-
 
         public IReadOnlyCollection<TEntity> ExecuteReaderCollectionEntities(string sqlExpression)
         {
@@ -258,7 +156,7 @@ namespace SeaBattle.Infrastructure.ORM
             {
                 while (reader.Read())
                 {
-                    enities.Add(CreateEntity(reader));
+                    enities.Add(CreateEntity(reader, 0));
                 }
             }
 
@@ -272,24 +170,64 @@ namespace SeaBattle.Infrastructure.ORM
 
             using var reader = command.ExecuteReader();
 
-            if (reader.Read())
+            var records = new List<(Board board, CoordinateShip coordinateShip)>();
+
+            var entities = new Dictionary<TEntity, List<CoordinateShip>>();
+
+            TEntity entity = null;
+
+            while (reader.Read())
             {
-                return CreateEntity(reader);
+                var fieldIndex = 0;
+
+                entity = CreateEntity(reader, fieldIndex);
+                fieldIndex += propertyInfos.Length;
+
+                //if( entities.TryGetValue(entity, out coordinateShips)
+
+
+
+                if (reader.FieldCount > fieldIndex)
+                {
+                    var coordinateShip = (CoordinateShip)_oRMContext.CreateEntityByEntityTypes[typeof(CoordinateShip)]
+                                                    .Invoke(null, new object[] { reader, fieldIndex });
+
+                    var board = (Board)Convert.ChangeType(entity, typeof(Board));
+                    records.Add((board, coordinateShip));
+                }
+            }
+            if (records.Count > 1)
+            {
+                var lookup = records.ToLookup(r => r.board, r => r.coordinateShip);
+
+                var lookthis = lookup.ToDictionary(g => g.Key, g=> g.Key);
+
+                var entites = new List<Board>();
+
+
+                foreach(var group in lookup)
+                {
+                    var entity2 = group.Key;
+                    entity2.CoordinateShips = group.ToList();
+
+                    entites.Add(entity2);
+                }
+
+                var stop = true;
             }
 
-            return null;
+            return entity;
         }
 
-        private static TEntity CreateEntity(SqlDataReader reader)
+        public static TEntity CreateEntity(SqlDataReader reader, int fieldIndex)
         {
             var entity = new TEntity();
 
-            for (int i = 0; i < reader.FieldCount; i++)
+            for (int i = fieldIndex, iLim = i + propertyInfos.Length; i < iLim; i++)
             {
-
                 var propertyInfo = propertyInfoByPropertyTitles[reader.GetName(i)];
 
-                propertyInfo.SetValue(entity, ConvertFromDbValue(reader.GetValue(i), propertyInfo.PropertyType));
+                propertyInfo.SetValue(entity, SqlConverter.ConvertFromDbValue(reader.GetValue(i), propertyInfo.PropertyType));
             }
 
             return entity;
@@ -322,7 +260,6 @@ namespace SeaBattle.Infrastructure.ORM
 
         private static bool IsBaseEntity(Type type)
         {
-
             do
             {
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(BaseEntity<>))
@@ -333,42 +270,6 @@ namespace SeaBattle.Infrastructure.ORM
             while ((type = type.BaseType) != null);
 
             return false;
-        }
-
-        public static string ConvertToDbValue(object @object)
-        {
-            if(@object is null)
-            {
-                return "NULL";
-            }
-            else if (@object is string)
-            {
-                return $"'{@object}'";
-            }
-            else if(@object is Enum @enum)
-            {
-                return ((int)@enum.GetTypeCode()).ToString();
-            }
-
-            return @object.ToString();
-        }
-
-        public static object ConvertFromDbValue(object @object, Type toType)
-        {
-            if (@object is DBNull)
-            {
-                return null;
-            }
-            else if (toType.IsEnum)
-            {
-                return Enum.ToObject(toType, Convert.ChangeType(@object, typeof(int)));
-            }
-            else if (toType == typeof(int?))
-            {
-                return (int?)Convert.ChangeType(@object, typeof(int));
-            }
-
-            return Convert.ChangeType(@object, toType);
         }
     }
 }

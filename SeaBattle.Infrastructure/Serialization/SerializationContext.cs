@@ -18,7 +18,7 @@ namespace SeaBattle.Infrastructure.Serialization
         private static readonly IDictionary<Type, FieldInfo> entityTypeFieldInfo = GetEntityTypeFieldInfos();
         
         [JsonIgnore]
-        public string JsonDataPath { get; init; }
+        public string JsonDataPath { get; set; }
 
         private static JsonSerializerSettings settings = new JsonSerializerSettings
         {
@@ -40,11 +40,6 @@ namespace SeaBattle.Infrastructure.Serialization
             }
         }
 
-        public SerializationContext(string jsonDataPath) : this()
-        {
-            JsonDataPath = jsonDataPath;
-        }
-
         public static TContext Load(string jsonDataPath)
         {
             string serializedContext;
@@ -58,7 +53,11 @@ namespace SeaBattle.Infrastructure.Serialization
                 return null;
             }
 
-            return JsonConvert.DeserializeObject<TContext>(serializedContext, settings);
+            var context = JsonConvert.DeserializeObject<TContext>(serializedContext, settings);
+
+            context.JsonDataPath = jsonDataPath;
+
+            return context;
         }
 
         

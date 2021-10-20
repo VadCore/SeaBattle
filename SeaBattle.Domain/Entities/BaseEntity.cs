@@ -8,13 +8,39 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
-	public abstract class BaseEntity<TEntity>
+	public abstract class BaseEntity<TEntity> : IEquatable<TEntity> where TEntity : BaseEntity<TEntity>
 	{
 		public int Id { get; set; }
 
 		private static readonly FieldInfo[] fieldInfos = GetFieldInfos();
 
-        private static FieldInfo[] GetFieldInfos()
+		public bool Equals(TEntity other)
+		{
+			return Id == other.Id;
+		}
+
+		public override bool Equals(object other)
+		{
+			return Equals(other as TEntity);
+		}
+
+		public static bool operator ==(BaseEntity<TEntity> left, TEntity right)
+		{
+			return (left is null == right is null) && (left is null || left.Equals(right));
+		}
+
+		public static bool operator !=(BaseEntity<TEntity> left, TEntity right)
+		{
+			return !(left == right);
+		}
+
+		public override int GetHashCode()
+		{
+			return Id.GetHashCode();
+		}
+
+
+		private static FieldInfo[] GetFieldInfos()
         {
 			var fields = typeof(BaseEntity<TEntity>).GetFields(ReflectionConstants.PublicInstance);
 
@@ -35,5 +61,7 @@ namespace SeaBattle.Domain.Entities
 		public string ValuesToString(IEnumerable<FieldInfo> fieldInfos) =>
 			string.Join(", ", fieldInfos.Select(f =>
 				f.Name[1..f.Name.IndexOf('>')] + " - " + f.GetValue(this)?.ToString()));
-	}
+
+        
+    }
 }

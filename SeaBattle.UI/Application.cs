@@ -35,7 +35,7 @@ namespace SeaBattle.UI
 			var player1 = _playerService.Create("Vasya", board);
 			var player2 = _playerService.Create("Petya", board);
 
-			var player1BattleMiddleShip = _shipService.CreateBattle(SizeId.MiddleShip, player1, new Coordinate(0, 5, 5), Rotation.Horizontal);
+			var player1BattleMiddleShip = _shipService.CreateBattle(SizeId.MiddleShip, player1, new Coordinate(0, 6, 5), Rotation.Horizontal);
 
 			var player2UniversalHugeShip = _shipService.CreateBattle(SizeId.HugeShip, player2, new Coordinate(0, 1, 5), Rotation.Horizontal);
 

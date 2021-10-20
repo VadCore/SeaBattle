@@ -45,7 +45,7 @@ namespace SeaBattle.Application.Services
                                                     && cs.XAbs == coordinate.XAbs
                                                     && cs.YAbs == cs.YAbs).ShipId;
 
-            if (shipId == 0)
+            if (shipId == null)
             {
                 return null;
             }

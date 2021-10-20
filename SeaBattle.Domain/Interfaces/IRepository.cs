@@ -18,7 +18,8 @@ namespace SeaBattle.Domain.Interfaces
 
 		public IReadOnlyCollection<TEntity> GetAll();
 
-		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate);
+		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings);
+		//public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeStrings);
 
 		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate);
 

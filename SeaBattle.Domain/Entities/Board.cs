@@ -17,6 +17,8 @@ namespace SeaBattle.Domain.Entities
         public int TurnPlayerId { get; set; }
 
         [JsonIgnore]
+        public IList<Player> Players { get; set; }
+        [JsonIgnore]
         public IList<CoordinateShip> CoordinateShips 
         {   
             get => coordinateShips ??= new List<CoordinateShip>(); 

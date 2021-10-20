@@ -44,9 +44,9 @@ namespace SeaBattle.Infrastructure.Repositories
 			return (IReadOnlyCollection<TEntity>)_entities.GetAll();
 		}
 
-        public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate)
-        {
-			return _entities.FindFirst(predicate);
+		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings)
+		{
+			return _entities.FindFirst(predicate, includeStrings);
         }
 
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)

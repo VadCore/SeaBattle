@@ -40,7 +40,7 @@ namespace SeaBattle.Infrastructure.Repositories
 
 		public TEntity GetById(int id)
 		{
-			return _entities.FirstOrDefault(e => e.Id == id);
+			return _entities.GetById(id);
 		}
 
 		public IReadOnlyCollection<TEntity> GetAll()
@@ -48,30 +48,29 @@ namespace SeaBattle.Infrastructure.Repositories
 			return (IReadOnlyCollection<TEntity>)_entities;
 		}
 
-		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate)
+		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings)
 		{
-			return _entities.FirstOrDefault(predicate.Compile());
+			return _entities.FindFirst(predicate, includeStrings);
 		}
 
 		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
 		{
-			return _entities.Where(predicate.Compile());
+			return _entities.FindAll(predicate);
 		}
 
 		public void Update(TEntity entity)
 		{
-			_entities[_entities.IndexOf(GetById(entity.Id))] = entity;
+			_entities.Update(entity);
 		}
 
 		public void Delete(TEntity entity)
 		{
-			_entities.Remove(entity);
-			_entities[_entities.IndexOf(GetById(entity.Id))] = entity;
+			_entities.Delete(entity);
 		}
 
 		public void Delete(int id)
 		{
-			_entities.Remove(GetById(id));
+			_entities.Delete(id);
 		}
 
 		public void SaveChanges()
