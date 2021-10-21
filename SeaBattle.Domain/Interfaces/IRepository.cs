@@ -1,10 +1,7 @@
 ﻿using SeaBattle.Domain.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Interfaces
 {
@@ -14,14 +11,14 @@ namespace SeaBattle.Domain.Interfaces
 
 		public void Add(IEnumerable<TEntity> entities);
 
-		public TEntity GetById(int id);
+		public TEntity GetById(int id, params string[] navigationTitles);
 
-		public IReadOnlyCollection<TEntity> GetAll();
+		public IReadOnlyCollection<TEntity> GetAll(params string[] navigationTitles);
 
-		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings);
-		//public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includeStrings);
+		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] navigationTitles);
+		//public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] navigationTitles);
 
-		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate);
+		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, params string[] navigationTitles);
 
 		public void Update(TEntity entity);
 		public void Delete(TEntity entity);

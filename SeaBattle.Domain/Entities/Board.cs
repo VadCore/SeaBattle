@@ -1,106 +1,101 @@
-﻿using SeaBattle.Domain.Common;
+﻿using Newtonsoft.Json;
+using SeaBattle.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace SeaBattle.Domain.Entities
 {
-    public class Board : BaseEntity<Board>
-    {
-        public const int Quadrants = 4;
-        public int XAbsMax { get; set; }
-        public int YAbsMax { get; set; }
-        public int Turn { get; set; }
-        public int TurnPlayerId { get; set; }
+	public class Board : BaseEntity<Board>
+	{
+		public const int Quadrants = 4;
+		public int XAbsMax { get; set; }
+		public int YAbsMax { get; set; }
+		public int Turn { get; set; }
+		public int TurnPlayerId { get; set; }
 
-        [JsonIgnore]
-        public IList<Player> Players { get; set; }
-        [JsonIgnore]
-        public IList<CoordinateShip> CoordinateShips 
-        {   
-            get => coordinateShips ??= new List<CoordinateShip>(); 
-            set => coordinateShips = value; 
-        }
-        private IList<CoordinateShip> coordinateShips;
-        public Board(int xAbsMax, int yAbsMax)
-        {
-            XAbsMax = xAbsMax;
-            YAbsMax = yAbsMax;
-        }
+		[JsonIgnore]
+		public IList<Player> Players { get; set; }  = new List<Player>();
 
-        public Board()
-        {
-        }
+		[JsonIgnore]
+		public IList<CoordinateShip> CoordinateShips { get; set; } = new List<CoordinateShip>();
 
-        public Ship this[Coordinate coordinate]
-        {
-            get
-            {
+		public Board(int xAbsMax, int yAbsMax)
+		{
+			XAbsMax = xAbsMax;
+			YAbsMax = yAbsMax;
+		}
 
-                return CoordinateShips.First(cs => cs.Quadrant == coordinate.Quadrant 
-                                        && cs.XAbs == coordinate.XAbs 
-                                        && cs.YAbs == coordinate.YAbs).Ship;
-            }
-            set
-            {
-                CoordinateShips.First(cs => cs.Quadrant == coordinate.Quadrant 
-                                        && cs.XAbs == coordinate.XAbs 
-                                        && cs.YAbs == coordinate.YAbs).Ship = value;
-            }
-        }
+		public Board()
+		{
+		}
 
-        public override string ToString()
-        {
-            var sortedUnits = new List<Ship>();
+		public Ship this[Coordinate coordinate]
+		{
+			get
+			{
 
-            for (int d = 0, dLim = Math.Max(XAbsMax, YAbsMax); d <= dLim; d++)
-            {
-                for (int q = 0; q < Quadrants; q++)
-                {
-                    for (int i = 0; i <= d; i++)
-                    {
-                        
-                        if (d <= XAbsMax && i <= YAbsMax)
-                        {
-                            var coordinate = new Coordinate(q, d, i);
+				return CoordinateShips.First(cs => cs.Quadrant == coordinate.Quadrant
+										&& cs.XAbs == coordinate.XAbs
+										&& cs.YAbs == coordinate.YAbs).Ship;
+			}
+			set
+			{
+				CoordinateShips.First(cs => cs.Quadrant == coordinate.Quadrant
+										&& cs.XAbs == coordinate.XAbs
+										&& cs.YAbs == coordinate.YAbs).Ship = value;
+			}
+		}
 
-                            var ship = CoordinateShips.FirstOrDefault(cs => cs.BoardId == Id
-                                                            && cs.Quadrant == coordinate.Quadrant 
-                                                            && cs.XAbs == coordinate.XAbs 
-                                                            && cs.YAbs == coordinate.YAbs)?.Ship;
+		public override string ToString()
+		{
+			var sortedUnits = new List<Ship>();
 
-                            if (ship != null)
-                            {
-                                sortedUnits.Add(ship);
-                            }
-                        }
+			for (int d = 0, dLim = Math.Max(XAbsMax, YAbsMax); d <= dLim; d++)
+			{
+				for (int q = 0; q < Quadrants; q++)
+				{
+					for (int i = 0; i <= d; i++)
+					{
 
-                        if (i <= XAbsMax && d <= YAbsMax)
-                        {
-                            var coordinate = new Coordinate(q, i, d);
+						if (d <= XAbsMax && i <= YAbsMax)
+						{
+							var coordinate = new Coordinate(q, d, i);
 
-                            var ship = CoordinateShips.FirstOrDefault(cs => cs.BoardId == Id
-                                                            && cs.Quadrant == coordinate.Quadrant
-                                                            && cs.XAbs == coordinate.XAbs
-                                                            && cs.YAbs == coordinate.YAbs)?.Ship;
+							var ship = CoordinateShips.FirstOrDefault(cs => cs.BoardId == Id
+															&& cs.Quadrant == coordinate.Quadrant
+															&& cs.XAbs == coordinate.XAbs
+															&& cs.YAbs == coordinate.YAbs)?.Ship;
 
-                            if (ship != null)
-                            {
-                                sortedUnits.Add(ship);
-                            }
-                        }
+							if (ship != null)
+							{
+								sortedUnits.Add(ship);
+							}
+						}
 
-                    }
-                }
-            }
+						if (i <= XAbsMax && d <= YAbsMax)
+						{
+							var coordinate = new Coordinate(q, i, d);
 
-            var distinctSortedUnits = sortedUnits.Distinct().ToList();
+							var ship = CoordinateShips.FirstOrDefault(cs => cs.BoardId == Id
+															&& cs.Quadrant == coordinate.Quadrant
+															&& cs.XAbs == coordinate.XAbs
+															&& cs.YAbs == coordinate.YAbs)?.Ship;
 
-            return string.Join('|', distinctSortedUnits);
-        }
+							if (ship != null)
+							{
+								sortedUnits.Add(ship);
+							}
+						}
 
-    }
+					}
+				}
+			}
+
+			var distinctSortedUnits = sortedUnits.Distinct().ToList();
+
+			return string.Join('|', distinctSortedUnits);
+		}
+
+	}
 }

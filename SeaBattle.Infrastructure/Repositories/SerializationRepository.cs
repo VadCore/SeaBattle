@@ -1,13 +1,9 @@
 ﻿using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
-using SeaBattle.Infrastructure.Interfaces;
 using SeaBattle.Infrastructure.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Repositories
 {
@@ -31,19 +27,19 @@ namespace SeaBattle.Infrastructure.Repositories
 
 		public void Add(IEnumerable<TEntity> entities)
 		{
-			foreach(var entity in entities)
-            {
+			foreach (var entity in entities)
+			{
 				_entities.Add(entity);
 
 			}
 		}
 
-		public TEntity GetById(int id)
+		public TEntity GetById(int id, params string[] includeStrings)
 		{
 			return _entities.GetById(id);
 		}
 
-		public IReadOnlyCollection<TEntity> GetAll()
+		public IReadOnlyCollection<TEntity> GetAll(params string[] includeStrings)
 		{
 			return (IReadOnlyCollection<TEntity>)_entities;
 		}
@@ -53,7 +49,7 @@ namespace SeaBattle.Infrastructure.Repositories
 			return _entities.FindFirst(predicate, includeStrings);
 		}
 
-		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
+		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings)
 		{
 			return _entities.FindAll(predicate);
 		}
@@ -74,8 +70,8 @@ namespace SeaBattle.Infrastructure.Repositories
 		}
 
 		public void SaveChanges()
-        {
+		{
 			_unitOfWork.Commit();
-        }
+		}
 	}
 }

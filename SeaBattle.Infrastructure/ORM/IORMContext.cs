@@ -1,22 +1,21 @@
 ﻿using Microsoft.Data.SqlClient;
+using SeaBattle.Domain.Entities;
+using SeaBattle.Infrastructure.ORM.NavigationConfigurator;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.ORM
 {
-    public interface IORMContext : IDisposable
-    {
-        public SqlConnection Connection { get; }
-        public SqlTransaction Transaction { get; }
+	public interface IORMContext : IDisposable
+	{
+		public SqlConnection Connection { get; }
+		public SqlTransaction Transaction { get; }
+		public IDictionary<Type, PropertyInfo> OrmSetPropertyInfoByEntityTypes { get; }
+		public IDictionary<Type, MethodInfo> CreateEntityByEntityTypes { get; }
+		public IDictionary<Type, string> DbTableTitleByEntityTypes { get; }
+		public IDictionary<string, Navigation> NavigationByTitles { get; }
 
-        public IDictionary<string, string> NavigationTableTitleByNavigationIncludes { get; }
-        public IDictionary<string, string> FkBindingByNavigationIncludes { get; }
-
-        public IDictionary<Type, MethodInfo> CreateEntityByEntityTypes { get; }
-        public IDictionary<Type, string> DbTableTitleByEntityTypes { get; }
-    }
+		public ORMSet<TEntity> GetORMSet<TEntity>() where TEntity : BaseEntity<TEntity>, new();
+	}
 }

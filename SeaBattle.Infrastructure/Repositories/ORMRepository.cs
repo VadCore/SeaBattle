@@ -1,13 +1,9 @@
 ﻿using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
-using SeaBattle.Infrastructure.Interfaces;
 using SeaBattle.Infrastructure.ORM;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Infrastructure.Repositories
 {
@@ -21,7 +17,7 @@ namespace SeaBattle.Infrastructure.Repositories
 		public ORMRepository(SeaBattleORMContext context)
 		{
 			_unitOfWork = (IUnitOfWork)context;
-			_entities = context.Set<TEntity>();
+			_entities = context.GetORMSet<TEntity>();
 		}
 
 		public TEntity Add(TEntity entity)
@@ -34,27 +30,27 @@ namespace SeaBattle.Infrastructure.Repositories
 			_entities.Add(entities);
 		}
 
-		public TEntity GetById(int id)
+		public TEntity GetById(int id, params string[] navigationTitles)
 		{
-			return _entities.GetById(id);
+			return _entities.GetById(id, navigationTitles);
 		}
 
-		public IReadOnlyCollection<TEntity> GetAll()
+		public IReadOnlyCollection<TEntity> GetAll(params string[] navigationTitles)
 		{
-			return (IReadOnlyCollection<TEntity>)_entities.GetAll();
+			return _entities.GetAll(navigationTitles);
 		}
 
-		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] includeStrings)
+		public TEntity FindFirst(Expression<Func<TEntity, bool>> predicate, params string[] navigationTitles)
 		{
-			return _entities.FindFirst(predicate, includeStrings);
-        }
-
-        public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate)
-        {
-			return _entities.FindAll(predicate);
+			return _entities.FindFirst(predicate, navigationTitles);
 		}
 
-        public void Update(TEntity entity)
+		public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, params string[] navigationTitles)
+		{
+			return _entities.FindAll(predicate, navigationTitles);
+		}
+
+		public void Update(TEntity entity)
 		{
 			_entities.Update(entity);
 		}
@@ -69,11 +65,11 @@ namespace SeaBattle.Infrastructure.Repositories
 			_entities.Delete(id);
 		}
 
-		
 
-        public void SaveChanges()
-        {
+
+		public void SaveChanges()
+		{
 			_unitOfWork.Commit();
-        }
-    }
+		}
+	}
 }

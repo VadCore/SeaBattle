@@ -4,10 +4,6 @@ using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Enums;
 using SeaBattle.Domain.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Application.Services
 {
@@ -20,21 +16,21 @@ namespace SeaBattle.Application.Services
 		protected readonly IRepository<SupportAbility> _supportAbilities;
 		protected readonly IRepository<BattleAbility> _battleAbilities;
 
-        public ShipService(IRepository<Player> players,
-                           IRepository<Board> boards,
-                           IRepository<Size> sizes,
-                           IRepository<CoordinateShip> coordinateShips,
-                           IRepository<Ship> ships, IRepository<SupportAbility> supportAbilities, IRepository<BattleAbility> battleAbilities) : base(ships)
-        {
-            _players = players;
-            _boards = boards;
-            _sizes = sizes;
-            _coordinateShips = coordinateShips;
-            _supportAbilities = supportAbilities;
-            _battleAbilities = battleAbilities;
-        }
+		public ShipService(IRepository<Player> players,
+						   IRepository<Board> boards,
+						   IRepository<Size> sizes,
+						   IRepository<CoordinateShip> coordinateShips,
+						   IRepository<Ship> ships, IRepository<SupportAbility> supportAbilities, IRepository<BattleAbility> battleAbilities) : base(ships)
+		{
+			_players = players;
+			_boards = boards;
+			_sizes = sizes;
+			_coordinateShips = coordinateShips;
+			_supportAbilities = supportAbilities;
+			_battleAbilities = battleAbilities;
+		}
 
-        public Ship CreateBattle(SizeId sizeId, Player player, Coordinate coordinate, Rotation rotation)
+		public Ship CreateBattle(SizeId sizeId, Player player, Coordinate coordinate, Rotation rotation)
 		{
 			var ship = Create(sizeId, player, coordinate, rotation);
 
@@ -126,54 +122,54 @@ namespace SeaBattle.Application.Services
 																&& cs.YAbs == coordinate.YAbs);
 				if (coordinateShip.ShipId != null && coordinateShip.ShipId != ship.Id)
 				{
-					if(!isOnlyCheck)
-                    {
-                        for (int k = i - 1; k >= 0; k--)
-                        {
+					if (!isOnlyCheck)
+					{
+						for (int k = i - 1; k >= 0; k--)
+						{
 
-                            coordinate -= (to.Quadrant == coordinate.Quadrant) ? step : -step;
-                            coordinateShip = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
-                                                                        && cs.Quadrant == coordinate.Quadrant
-                                                                        && cs.XAbs == coordinate.XAbs
-                                                                        && cs.YAbs == coordinate.YAbs);
+							coordinate -= (to.Quadrant == coordinate.Quadrant) ? step : -step;
+							coordinateShip = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																		&& cs.Quadrant == coordinate.Quadrant
+																		&& cs.XAbs == coordinate.XAbs
+																		&& cs.YAbs == coordinate.YAbs);
 
-                            coordinateShip.ShipId = null;
+							coordinateShip.ShipId = null;
 
-                            coordinateShip.Ship = null;
+							coordinateShip.Ship = null;
 
 							_coordinateShips.Update(coordinateShip);
 						}
-                    }
+					}
 
 					return false;
 				}
 
 				if (!isOnlyCheck)
 				{
-                    coordinateShip.ShipId = ship.Id;
+					coordinateShip.ShipId = ship.Id;
 
-                    coordinateShip.Ship = ship;
+					coordinateShip.Ship = ship;
 
 					_coordinateShips.Update(coordinateShip);
-                }
+				}
 
 				coordinate += (to.Quadrant == coordinate.Quadrant) ? step : -step;
 			}
 			if (!isOnlyCheck)
 			{
-                ship.Rotation = targetRotation;
+				ship.Rotation = targetRotation;
 
-                ship.CenterCoordinateShipId = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
-                                                                            && cs.Quadrant == to.Quadrant
-                                                                            && cs.XAbs == to.XAbs
-                                                                            && cs.YAbs == to.YAbs).Id;
+				ship.CenterCoordinateShipId = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																			&& cs.Quadrant == to.Quadrant
+																			&& cs.XAbs == to.XAbs
+																			&& cs.YAbs == to.YAbs).Id;
 
 				_entities.Update(ship);
-            }
+			}
 
 			return true;
 		}
-		
+
 
 		public void Dislocate(Ship ship, int length, Board board, Coordinate from)
 		{
@@ -217,11 +213,11 @@ namespace SeaBattle.Application.Services
 		}
 
 		public void Kill(Ship ship)
-        {
+		{
 			Dislocate(ship);
 
 			_entities.SaveChanges();
-        }
+		}
 
 		public bool Relocate(Ship ship, Coordinate to, Rotation targetRotation)
 		{

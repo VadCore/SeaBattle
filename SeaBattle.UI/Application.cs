@@ -1,12 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using SeaBattle.Application.Services.Interfaces;
+﻿using SeaBattle.Application.Services.Interfaces;
 using SeaBattle.Domain.Common;
 using SeaBattle.Domain.Enums;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.UI
 {
@@ -19,7 +14,7 @@ namespace SeaBattle.UI
 
 		public Application(IBoardService boardService,
 						   IPlayerService playerService,
-						   IShipService shipService, 
+						   IShipService shipService,
 						   IBattleAbilityService battleAbilityService)
 		{
 			_boardService = boardService;
@@ -43,7 +38,7 @@ namespace SeaBattle.UI
 
 			_battleAbilityService.Shot(player2UniversalHugeShip, new Coordinate(0, 6, 5));
 
-            Console.WriteLine("_boardService.ToString(board)");
+			Console.WriteLine("_boardService.ToString(board)");
 			Console.WriteLine(_boardService.ToString(board));
 
 			Console.WriteLine("_boardService.GetShipByIndexator");

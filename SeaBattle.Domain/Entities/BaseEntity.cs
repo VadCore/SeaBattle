@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
@@ -16,7 +14,7 @@ namespace SeaBattle.Domain.Entities
 
 		public bool Equals(TEntity other)
 		{
-			return Id == other.Id;
+			return Id == other?.Id;
 		}
 
 		public override bool Equals(object other)
@@ -41,27 +39,54 @@ namespace SeaBattle.Domain.Entities
 
 
 		private static FieldInfo[] GetFieldInfos()
-        {
-			var fields = typeof(BaseEntity<TEntity>).GetFields(ReflectionConstants.PublicInstance);
+		{
+			var fields = typeof(BaseEntity<TEntity>)
+							.GetFields(ReflectionConstants.PublicInstance)
+							.Where(fi => !IsBaseEntity(fi.FieldType)
+										&& !(fi.FieldType.IsGenericType
+										&& fi.FieldType.GenericTypeArguments.Any(a => IsBaseEntity(a)))).ToArray();
 
 			var entity = typeof(TEntity);
 
 			while (entity != typeof(BaseEntity<TEntity>))
 			{
-				fields = fields.Concat(entity.GetFields(ReflectionConstants.PublicInstance)).ToArray();
+				fields = fields.Concat(
+					entity.GetFields(ReflectionConstants.PublicInstance)
+						  .Where(fi => !IsBaseEntity(fi.FieldType)
+									&& !(fi.FieldType.IsGenericType
+									  && fi.FieldType.GenericTypeArguments.Any(a => IsBaseEntity(a))))).ToArray();
+
 				entity = entity.BaseType;
 			}
 
 			return fields;
 		}
 
-        public override string ToString() =>
-			typeof(TEntity).Name + ": " + ValuesToString(fieldInfos);
+		public override string ToString()
+		{
+			return typeof(TEntity).Name + ": " + ValuesToString(fieldInfos);
+		}
 
-		public string ValuesToString(IEnumerable<FieldInfo> fieldInfos) =>
-			string.Join(", ", fieldInfos.Select(f =>
-				f.Name[1..f.Name.IndexOf('>')] + " - " + f.GetValue(this)?.ToString()));
+		public string ValuesToString(IEnumerable<FieldInfo> fieldInfos)
+		{
+			return string.Join(", ", fieldInfos.Select(f =>
+								f.Name[1..f.Name.IndexOf('>')] + " - " + f.GetValue(this)?.ToString()));
+		}
 
-        
-    }
+		private static bool IsBaseEntity(Type type)
+		{
+			do
+			{
+				if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(BaseEntity<>))
+				{
+					return true;
+				}
+			}
+			while ((type = type.BaseType) != null);
+
+			return false;
+		}
+
+
+	}
 }
