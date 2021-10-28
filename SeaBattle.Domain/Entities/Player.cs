@@ -8,6 +8,8 @@
 
 		public Board Board { get; set; }
 
+		//public int UserId { get; set; }
+
 		public Player(string nick, int boardId)
 		{
 			Nick = nick;

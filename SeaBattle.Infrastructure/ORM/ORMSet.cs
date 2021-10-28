@@ -78,7 +78,7 @@ namespace SeaBattle.Infrastructure.ORM
 				$"SELECT * " +
 				$"FROM {_dbTableTitle} " +
 				$"{joinString}" +
-				$"WHERE Id = {id}";
+				$"WHERE {_dbTableTitle}.Id = {id}";
 
 			return ExecuteReaderEntity(sqlExpression, navigations?.ToList());
 		}
@@ -192,7 +192,12 @@ namespace SeaBattle.Infrastructure.ORM
 			return enities;
 		}
 
-		public TEntity CreateEntity(SqlDataReader reader, int fieldIndex, IList<Navigation> navigations = default, int navigationIndex = -1, object previosJoinedEntity = default)
+		public TEntity CreateEntity(
+			SqlDataReader reader, 
+			int fieldIndex, 
+			IList<Navigation> navigations = default, 
+			int navigationIndex = -1, 
+			object previosJoinedEntity = default)
 		{
 			//create entity
 			var entity = new TEntity();

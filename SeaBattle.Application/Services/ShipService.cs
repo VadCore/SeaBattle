@@ -7,30 +7,30 @@ using System;
 
 namespace SeaBattle.Application.Services
 {
-	public class ShipService : BaseService<Ship>, IShipService
-	{
-		protected readonly IRepository<Player> _players;
-		protected readonly IRepository<Board> _boards;
-		protected readonly IRepository<Size> _sizes;
-		protected readonly IRepository<CoordinateShip> _coordinateShips;
-		protected readonly IRepository<SupportAbility> _supportAbilities;
-		protected readonly IRepository<BattleAbility> _battleAbilities;
+    public class ShipService : BaseService<Ship>, IShipService
+    {
+        protected readonly IRepository<Player> _players;
+        protected readonly IRepository<Board> _boards;
+        protected readonly IRepository<Size> _sizes;
+        protected readonly IRepository<CoordinateShip> _coordinateShips;
+        protected readonly IRepository<SupportAbility> _supportAbilities;
+        protected readonly IRepository<BattleAbility> _battleAbilities;
 
-		public ShipService(IRepository<Player> players,
-						   IRepository<Board> boards,
-						   IRepository<Size> sizes,
-						   IRepository<CoordinateShip> coordinateShips,
-						   IRepository<Ship> ships, IRepository<SupportAbility> supportAbilities, IRepository<BattleAbility> battleAbilities) : base(ships)
-		{
-			_players = players;
-			_boards = boards;
-			_sizes = sizes;
-			_coordinateShips = coordinateShips;
-			_supportAbilities = supportAbilities;
-			_battleAbilities = battleAbilities;
-		}
+        public ShipService(IRepository<Player> players,
+                           IRepository<Board> boards,
+                           IRepository<Size> sizes,
+                           IRepository<CoordinateShip> coordinateShips,
+                           IRepository<Ship> ships, IRepository<SupportAbility> supportAbilities, IRepository<BattleAbility> battleAbilities) : base(ships)
+        {
+            _players = players;
+            _boards = boards;
+            _sizes = sizes;
+            _coordinateShips = coordinateShips;
+            _supportAbilities = supportAbilities;
+            _battleAbilities = battleAbilities;
+        }
 
-		public Ship CreateBattle(SizeId sizeId, Player player, Coordinate coordinate, Rotation rotation)
+        public Ship CreateBattle(SizeId sizeId, Player player, Coordinate coordinate, Rotation rotation)
 		{
 			var ship = Create(sizeId, player, coordinate, rotation);
 
