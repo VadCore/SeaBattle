@@ -9,19 +9,16 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
-    public class User : BaseEntity<User>, IIdentity
+    public class User : BaseEntity<User>
     {
         public string Email { get; set; }
         public string Password { get; set; }
 
         public int RoleId { get; set; }
-        public Role Role { get; set; }
-
-        public string AuthenticationType { get; set; }
-
-        public bool IsAuthenticated { get; set; }
+        //public Role Role { get; set; }
 
         public string Name { get; set; }
+        public string NormalizedName { get; set; }
 
         public IList<Player> Players { get; set; }
 
@@ -37,7 +34,6 @@ namespace SeaBattle.Domain.Entities
         {
             Email = email;
             Password = password;
-            Role = new Role();
         }
 
         public User() { }

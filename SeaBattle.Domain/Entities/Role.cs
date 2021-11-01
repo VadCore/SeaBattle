@@ -12,15 +12,17 @@ namespace SeaBattle.Domain.Entities
     {
         public string Name { get; set; }
 
-        public Role(string name)
+        public string NormalizedName { get; set; }
+
+        //public IList<User> Users { get; set; }
+
+        public Role(int id, RoleType roleType)
         {
-            Name = name;
+            Id = id;
+            Name = roleType.ToString();
+            NormalizedName = Name.ToUpperInvariant();
         }
 
-        public Role()
-        {
-        }
-
-        public IList<User> Users { get; set; }
+        public Role(){}
     }
 }

@@ -4,6 +4,6 @@ namespace SeaBattle.Application.Services.Interfaces
 {
 	public interface IPlayerService
 	{
-		public Player Create(string nick, Board board);
+		public Player Create(User user, Board board);
 	}
 }

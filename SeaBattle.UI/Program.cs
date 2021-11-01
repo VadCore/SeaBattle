@@ -53,6 +53,8 @@ namespace SeaBattle.UI
 						services.AddScoped<SeaBattleORMContext>();
 					}
 
+
+					services.AddScoped<IUserService, UserService>();
 					services.AddScoped<IBoardService, BoardService>();
 					services.AddScoped<IPlayerService, PlayerService>();
 					services.AddScoped<IShipService, ShipService>();

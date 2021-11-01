@@ -3,17 +3,18 @@
 	public class Player : BaseEntity<Player>
 	{
 		public int BoardId { get; set; }
-		public string Nick { get; set; }
 		public int ActiveUnitsCount { get; set; }
 
 		public Board Board { get; set; }
 
-		//public int UserId { get; set; }
+		//public User User { get; set; }
 
-		public Player(string nick, int boardId)
+		public int UserId { get; set; }
+
+		public Player(User user, int boardId)
 		{
-			Nick = nick;
 			BoardId = boardId;
+			UserId = user.Id;
 		}
 
 		public Player()

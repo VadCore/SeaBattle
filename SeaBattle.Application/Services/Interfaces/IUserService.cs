@@ -11,5 +11,6 @@ namespace SeaBattle.Application.Services.Interfaces
     public interface IUserService
     {
         public User Create(string email, string password, RoleType roleType, string name);
+        public User GetById(int id);
     }
 }

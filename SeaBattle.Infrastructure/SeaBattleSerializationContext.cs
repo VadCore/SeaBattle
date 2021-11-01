@@ -46,8 +46,9 @@ namespace SeaBattle.Infrastructure
 		{
 			var roles = new HashSet<Role>
 			{
-				new Role{ Id = 1, Name = "AvrageUser"},
-				new Role{ Id = 2, Name = "AdminUser"},
+				new Role(1, RoleType.Undefined),
+				new Role(2, RoleType.CommonUser),
+				new Role(3, RoleType.Admin),
 			};
 
 

@@ -75,7 +75,7 @@ namespace SeaBattle.Infrastructure.CustomIdentityProvider
             cancellationToken.ThrowIfCancellationRequested();
             if (normalizedRoleName == null)throw new ArgumentNullException(nameof(normalizedRoleName));
 
-            var role = _roles.FindFirst(r => r.Name == normalizedRoleName);
+            var role = _roles.FindFirst(r => r.NormalizedName == normalizedRoleName);
 
             if (role == null)
             {
@@ -136,7 +136,7 @@ namespace SeaBattle.Infrastructure.CustomIdentityProvider
             if (role == null) throw new ArgumentNullException(nameof(role));
             if (string.IsNullOrWhiteSpace(normalizedName)) throw new ArgumentNullException(nameof(normalizedName));
 
-            role.Name = normalizedName;
+            role.NormalizedName = normalizedName;
 
             _roles.Update(role);
           

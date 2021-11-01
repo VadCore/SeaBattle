@@ -10,25 +10,31 @@ namespace SeaBattle.UI
 		private readonly IBoardService _boardService;
 		private readonly IPlayerService _playerService;
 		private readonly IShipService _shipService;
+		private readonly IUserService _userService;
 		private readonly IBattleAbilityService _battleAbilityService;
 
-		public Application(IBoardService boardService,
-						   IPlayerService playerService,
-						   IShipService shipService,
-						   IBattleAbilityService battleAbilityService)
-		{
-			_boardService = boardService;
-			_playerService = playerService;
-			_shipService = shipService;
-			_battleAbilityService = battleAbilityService;
-		}
+        public Application(IBoardService boardService,
+                           IPlayerService playerService,
+                           IShipService shipService,
+                           IBattleAbilityService battleAbilityService, 
+						   IUserService userService)
+        {
+            _boardService = boardService;
+            _playerService = playerService;
+            _shipService = shipService;
+            _battleAbilityService = battleAbilityService;
+            _userService = userService;
+        }
 
-		public void Run()
+        public void Run()
 		{
 			var board = _boardService.Create(10, 10);
 
-			var player1 = _playerService.Create("Vasya", board);
-			var player2 = _playerService.Create("Petya", board);
+			var user1 = _userService.GetById(1);
+			var user2 = _userService.GetById(2);
+
+			var player1 = _playerService.Create(user1, board);
+			var player2 = _playerService.Create(user2, board);
 
 			var player1BattleMiddleShip = _shipService.CreateBattle(SizeId.MiddleShip, player1, new Coordinate(0, 6, 5), Rotation.Horizontal);
 

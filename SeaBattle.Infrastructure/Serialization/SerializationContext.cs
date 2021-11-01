@@ -10,7 +10,7 @@ using System.Text;
 
 namespace SeaBattle.Infrastructure.Serialization
 {
-	public abstract class SerializationContext<TContext> where TContext : SerializationContext<TContext>
+	public abstract class SerializationContext<TContext> : IDisposable where TContext : SerializationContext<TContext>
 	{
 		private static readonly FieldInfo[] fieldInfos = GetFieldInfos();
 		private static readonly IDictionary<Type, FieldInfo> entityTypeFieldInfo = GetEntityTypeFieldInfos();
@@ -88,6 +88,12 @@ namespace SeaBattle.Infrastructure.Serialization
 			string serializedContext = JsonConvert.SerializeObject(this, settings);
 
 			File.WriteAllText(JsonDataPath, serializedContext, Encoding.UTF8);
+			
 		}
-	}
+
+        public void Dispose()
+        {
+            
+        }
+    }
 }

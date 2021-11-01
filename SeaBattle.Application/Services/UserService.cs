@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SeaBattle.Application.Services
 {
-    class UserService : BaseService<User>, IUserService
+    public class UserService : BaseService<User>, IUserService
     {
 		public UserService(IRepository<User> users) : base(users){}
 
@@ -29,5 +29,10 @@ namespace SeaBattle.Application.Services
 
 			return user;
 		}
+
+		public User GetById(int id)
+        {
+			return _entities.GetById(id);
+        }
 	}
 }

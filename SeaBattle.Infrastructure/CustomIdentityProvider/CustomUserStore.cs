@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SeaBattle.Domain.Entities;
+using SeaBattle.Domain.Enums;
 using SeaBattle.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,14 +12,17 @@ using System.Threading.Tasks;
 namespace SeaBattle.Infrastructure.CustomIdentityProvider
 {
 
-    public class CustomUserStore : IUserStore<User>,
+    public class CustomUserStore : IUserRoleStore<User>,
         IUserPasswordStore<User>
     {
         private readonly IRepository<User> _users;
+        private readonly IRoleStore<Role> _roleStore;
+        
 
-        public CustomUserStore(IRepository<User> users)
+        public CustomUserStore(IRepository<User> users, IRoleStore<Role> roleStore)
         {
             _users = users;
+            _roleStore = roleStore;
         }
 
         public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
@@ -78,7 +82,7 @@ namespace SeaBattle.Infrastructure.CustomIdentityProvider
                 throw new ArgumentNullException(nameof(normalizedUserName));
             }
 
-            var user = _users.FindFirst(u => u.Name == normalizedUserName);
+            var user = _users.FindFirst(u => u.NormalizedName == normalizedUserName);
 
             //if(user == null)
             //{
@@ -93,7 +97,7 @@ namespace SeaBattle.Infrastructure.CustomIdentityProvider
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            var result = _users.FindFirst(u => u == user).Name;
+            var result = _users.FindFirst(u => u.Id == user.Id).NormalizedName;
 
             if (String.IsNullOrEmpty(result))
             {
@@ -108,7 +112,7 @@ namespace SeaBattle.Infrastructure.CustomIdentityProvider
             cancellationToken.ThrowIfCancellationRequested();
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            var userPasswordHash = _users.FindFirst(u => u == user).Password;
+            var userPasswordHash = _users.FindFirst(u => u.Id == user.Id).Password;
 
             if (String.IsNullOrEmpty(userPasswordHash))
             {
@@ -166,7 +170,7 @@ namespace SeaBattle.Infrastructure.CustomIdentityProvider
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (string.IsNullOrWhiteSpace(normalizedName)) throw new ArgumentNullException(nameof(normalizedName));
 
-            user.Name = normalizedName;
+            user.NormalizedName = normalizedName;
             _users.Update(user);
 
             _users.SaveChanges();
@@ -225,6 +229,64 @@ namespace SeaBattle.Infrastructure.CustomIdentityProvider
         public void Dispose()
         {
            
+        }
+
+        public async Task AddToRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var role = await _roleStore.FindByNameAsync(roleName, cancellationToken);
+
+            user.RoleId = role.Id;
+
+            _users.Update(user);
+            _users.SaveChanges();
+        }
+
+        public Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            user.RoleId =  (int)RoleType.Undefined;
+
+            _users.Update(user);
+            _users.SaveChanges();
+
+            return Task.FromResult<object>(null);
+        }
+
+        public async Task<IList<string>> GetRolesAsync(User user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var role = await _roleStore.FindByIdAsync(user.RoleId.ToString(), cancellationToken);
+
+            var roleName = await _roleStore.GetRoleNameAsync(role, cancellationToken);
+
+            return new List<string> { roleName };
+        }
+
+        public async Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            var role = await _roleStore.FindByNameAsync(roleName, cancellationToken);
+
+            return role.Id == user.RoleId;
+        }
+
+        public async Task<IList<User>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (roleName == null) throw new ArgumentNullException(nameof(roleName));
+
+            var roleId = (await _roleStore.FindByNameAsync(roleName, cancellationToken)).Id;
+
+            return _users.FindAll(u => u.RoleId == roleId).ToList();
         }
     }
 }

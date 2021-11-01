@@ -8,7 +8,8 @@ namespace SeaBattle.Domain.Enums
 {
     public enum RoleType
     {
-        AvrUser = 1,
-        Admin = 2
+        Undefined = 1,
+        CommonUser = 2,
+        Admin = 3
     }
 }

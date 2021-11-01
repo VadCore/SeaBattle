@@ -56,8 +56,7 @@ namespace SeaBattle.MVC.Controllers
 
         public async Task<IActionResult> LogoutAsync()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
+            await _signInManager.SignOutAsync();
 
             return RedirectToAction("Login");
         }
@@ -70,12 +69,14 @@ namespace SeaBattle.MVC.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = new User(model.Email, model.LoginModel.Password, RoleType.AvrUser, model.LoginModel.Name);
+                var user = new User(model.Email, model.LoginModel.Password, RoleType.CommonUser, model.LoginModel.Name);
 
-                var result = await _userManager.CreateAsync(user);
+                var result = await _userManager.CreateAsync(user, user.Password);
 
                 if (result.Succeeded)
                 {
+                    await _signInManager.PasswordSignInAsync(model.LoginModel.Name, model.LoginModel.Password, true, lockoutOnFailure: false);
+
                     return RedirectToAction("Index", "Home");
                 }
 
