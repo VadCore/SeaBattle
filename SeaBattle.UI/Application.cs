@@ -53,7 +53,6 @@ namespace SeaBattle.UI
 			Console.WriteLine("Test");
 
 			Console.ReadKey();
-
 		}
 	}
 }

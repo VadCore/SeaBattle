@@ -62,8 +62,6 @@ namespace SeaBattle.UI
 					services.AddScoped<IBattleAbilityService, BattleAbilityService>();
 				}).Build();
 
-
-
 			ActivatorUtilities.CreateInstance<Application>(host.Services).Run();
 		}
 

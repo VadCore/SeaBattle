@@ -50,10 +50,6 @@ namespace SeaBattle.MVC
 
             services.AddIdentity<User, Role>()
                 .AddDefaultTokenProviders();
-                //.AddUserStore<CustomUserStore>()
-                //.AddRoleStore<CustomRoleStore>();
-
-            //services.AddAuthorization();
 
             services.AddControllersWithViews();  
 

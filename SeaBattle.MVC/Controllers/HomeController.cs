@@ -17,10 +17,10 @@ namespace SeaBattle.MVC.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        //public HomeController(ILogger<HomeController> logger)
-        //{
-        //    _logger = logger;
-        //}
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
 
 
 
@@ -51,7 +51,6 @@ namespace SeaBattle.MVC.Controllers
             return View();
         }
 
-        //[Authorize(Roles = nameof(RoleType.CommonUser))]
         public IActionResult Privacy()
         {
             return View();
