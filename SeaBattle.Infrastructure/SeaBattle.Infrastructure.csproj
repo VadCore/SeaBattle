@@ -6,11 +6,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SeaBattle.Domain\SeaBattle.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SQL\" />
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,11 @@
-﻿using SeaBattle.Domain.Common;
-using SeaBattle.Domain.Enums;
+﻿using SeaBattle.Domain.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Domain.Entities
 {
-	public class Ship : BaseEntity
+	public class Ship : BaseEntity<Ship>
 	{
 		public int PlayerId { get; init; }
 		public int SizeId { get; init; }
@@ -17,6 +13,11 @@ namespace SeaBattle.Domain.Entities
 		public int CenterCoordinateShipId { get; set; }
 		public Rotation Rotation { get; set; }
 		public int NextTurn { get; set; }
+
+		public CoordinateShip CenterCoordinateShip { get; set; }
+
+		[JsonIgnore]
+		public IList<CoordinateShip> CoordinateShips { get; set; } = new List<CoordinateShip>();
 
 		public Ship(int sizeId, int playerId, int health)
 		{
@@ -29,9 +30,6 @@ namespace SeaBattle.Domain.Entities
 		{
 		}
 
-
-
-
 		public void Damage(int damage)
 		{
 			Health -= damage;
@@ -42,5 +40,10 @@ namespace SeaBattle.Domain.Entities
 		{
 			Health = Math.Max(Health + healShot, healthMax);
 		}
+
+		//     public override string ToString()
+		//     {
+		//return string.Format($"PlayerId: {PlayerId}, SizeId: {SizeId}, CenterCoordinateShipId: {CenterCoordinateShipId}");
+		//     }
 	}
 }

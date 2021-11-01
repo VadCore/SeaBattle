@@ -25,7 +25,7 @@ INSERT INTO Sizes(Title, [Length], HealthMax, Speed, [Range], Reloading, DamageS
 	('BigShip', 5, 5, 5, 6, 1, 3, 3),
 	('HugeShip', 7, 7, 7, 4, 4, 4, 4)
 
-INSERT INTO Ships(PlayerId, SizeId, CenterCoordinateId, Health, Rotation, NextTurn)
+INSERT INTO Ships(PlayerId, SizeId, CenterCoordinateShipId, Health, Rotation, NextTurn)
 	VALUES
 	(1, 1, 1, 1, 1, 1),
 	(1, 2, 2, 3, 0, 2),

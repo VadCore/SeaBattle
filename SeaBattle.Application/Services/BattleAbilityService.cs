@@ -3,25 +3,29 @@ using SeaBattle.Domain.Common;
 using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Application.Services
 {
+	[System.Runtime.InteropServices.Guid("5B0CF9D8-5663-4A84-A08E-564AB2B7A657")]
 	public class BattleAbilityService : AbilityService<BattleAbility>, IBattleAbilityService
 	{
-		private readonly IShipService _shipService;
 
-		public BattleAbilityService(IUnitOfWork unitOfWork, IShipService shipService) : base(unitOfWork, shipService)
+
+		public BattleAbilityService(IRepository<Player> players,
+									IRepository<Board> boards,
+									IRepository<Size> sizes,
+									IShipService shipService,
+									IRepository<Ship> ships,
+									IRepository<CoordinateShip> coordinateShips,
+									IRepository<BattleAbility> battleAbilities)
+										: base(battleAbilities, players, boards, sizes, shipService, ships, coordinateShips)
 		{
-			_shipService = shipService;
+
 		}
 
 		public bool Shot(Ship ship, Coordinate coordinate)
 		{
-			var battleAbility = _unitOfWork.BattleAbilities.FindFirst(ba => ba.ShipId == ship.Id);
+			var battleAbility = _entities.FindFirst(ba => ba.ShipId == ship.Id);
 
 			if (!StartReloading(ship, battleAbility))
 			{
@@ -35,14 +39,21 @@ namespace SeaBattle.Application.Services
 				return false;
 			}
 
-			var size = _unitOfWork.Sizes.GetById(ship.SizeId);
+			_entities.Update(battleAbility);
+
+			var size = _sizes.GetById(ship.SizeId);
 
 			targetShip.Damage(size.DamageShot);
 
 			if (targetShip.Health <= 0)
 			{
-				_shipService.Dislocate(targetShip);
+				_shipService.Kill(targetShip);
+				Console.WriteLine(ship.ToString() + " HAS BEEN SUNK");
 			}
+
+			_ships.Update(targetShip);
+
+			_entities.SaveChanges();
 
 			return true;
 		}

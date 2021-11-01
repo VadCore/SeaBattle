@@ -4,17 +4,30 @@ using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Enums;
 using SeaBattle.Domain.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Application.Services
 {
 	public class ShipService : BaseService<Ship>, IShipService
 	{
-		public ShipService(IUnitOfWork unitOfWork) : base(unitOfWork)
+		protected readonly IRepository<Player> _players;
+		protected readonly IRepository<Board> _boards;
+		protected readonly IRepository<Size> _sizes;
+		protected readonly IRepository<CoordinateShip> _coordinateShips;
+		protected readonly IRepository<SupportAbility> _supportAbilities;
+		protected readonly IRepository<BattleAbility> _battleAbilities;
+
+		public ShipService(IRepository<Player> players,
+						   IRepository<Board> boards,
+						   IRepository<Size> sizes,
+						   IRepository<CoordinateShip> coordinateShips,
+						   IRepository<Ship> ships, IRepository<SupportAbility> supportAbilities, IRepository<BattleAbility> battleAbilities) : base(ships)
 		{
+			_players = players;
+			_boards = boards;
+			_sizes = sizes;
+			_coordinateShips = coordinateShips;
+			_supportAbilities = supportAbilities;
+			_battleAbilities = battleAbilities;
 		}
 
 		public Ship CreateBattle(SizeId sizeId, Player player, Coordinate coordinate, Rotation rotation)
@@ -23,8 +36,8 @@ namespace SeaBattle.Application.Services
 
 			if (ship is not null)
 			{
-				_unitOfWork.BattleAbilities.Add(new BattleAbility(ship.Id));
-				_unitOfWork.Commit();
+				_battleAbilities.Add(new BattleAbility(ship.Id));
+				_entities.SaveChanges();
 			}
 
 
@@ -37,10 +50,10 @@ namespace SeaBattle.Application.Services
 
 			if (ship is not null)
 			{
-				_unitOfWork.SupportAbilities.Add(new SupportAbility(ship.Id));
+				_supportAbilities.Add(new SupportAbility(ship.Id));
 			}
 
-			_unitOfWork.Commit();
+			_entities.SaveChanges();
 
 			return ship;
 		}
@@ -51,33 +64,45 @@ namespace SeaBattle.Application.Services
 
 			if (ship is not null)
 			{
-				_unitOfWork.BattleAbilities.Add(new BattleAbility(ship.Id));
-				_unitOfWork.SupportAbilities.Add(new SupportAbility(ship.Id));
+				_battleAbilities.Add(new BattleAbility(ship.Id));
+				_supportAbilities.Add(new SupportAbility(ship.Id));
 			}
 
-			_unitOfWork.Commit();
+			_entities.SaveChanges();
 
 			return ship;
 		}
 
 		private Ship Create(SizeId sizeId, Player player, Coordinate coordinate, Rotation rotation)
 		{
-			var size = _unitOfWork.Sizes.GetById((int)sizeId);
-			var ship = _unitOfWork.Ships.Add(new Ship((int)sizeId, player.Id, size.HealthMax));
-			var board = _unitOfWork.Boards.GetById(player.BoardId);
 
-			if (!Allocate(ship, size.Length, board, coordinate, rotation))
+			var size = _sizes.GetById((int)sizeId);
+			var board = _boards.GetById(player.BoardId);
+
+			var ship = new Ship((int)sizeId, player.Id, size.HealthMax);
+
+			if (Allocate(ship, size.Length, board, coordinate, rotation, true))
 			{
-				_unitOfWork.Ships.Delete(ship.Id);
-				return null;
+				ship.CenterCoordinateShipId = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																&& cs.Quadrant == coordinate.Quadrant
+																&& cs.XAbs == coordinate.XAbs
+																&& cs.YAbs == coordinate.YAbs).Id;
+				_entities.Add(ship);
+
+				if (!Allocate(ship, size.Length, board, coordinate, rotation))
+				{
+					_entities.Delete(ship.Id);
+					return null;
+				}
+
+				return ship;
 			}
 
-			return ship;
+			return null;
 		}
 
 
-
-		private bool Allocate(Ship ship, int length, Board board, Coordinate to, Rotation targetRotation)
+		private bool Allocate(Ship ship, int length, Board board, Coordinate to, Rotation targetRotation, bool isOnlyCheck = false)
 		{
 			if (to.XAbs + (targetRotation == Rotation.Horizontal ? length / 2 : 0) > board.XAbsMax
 			 || to.YAbs + (targetRotation == Rotation.Vertical ? length / 2 : 0) > board.YAbsMax)
@@ -85,92 +110,122 @@ namespace SeaBattle.Application.Services
 				return false;
 			}
 
-			
-
 			var step = Vector2D.Create(targetRotation);
 
 			var coordinate = to - (length / 2) * step;
 
 			for (int i = 0; i < length; i++)
 			{
-				var coordinateShip = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-																				&& cs.Coordinate == coordinate);
-				if (coordinateShip.ShipId != 0 && coordinateShip.ShipId != ship.Id)
+				var coordinateShip = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																&& cs.Quadrant == coordinate.Quadrant
+																&& cs.XAbs == coordinate.XAbs
+																&& cs.YAbs == coordinate.YAbs);
+				if (coordinateShip.ShipId != null && coordinateShip.ShipId != ship.Id)
 				{
-					for (i--; i >= 0; i--)
+					if (!isOnlyCheck)
 					{
-						coordinate -= step;
-						coordinateShip = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-																 && cs.Coordinate == coordinate);
+						for (int k = i - 1; k >= 0; k--)
+						{
 
-						coordinateShip.ShipId = 0;
+							coordinate -= (to.Quadrant == coordinate.Quadrant) ? step : -step;
+							coordinateShip = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																		&& cs.Quadrant == coordinate.Quadrant
+																		&& cs.XAbs == coordinate.XAbs
+																		&& cs.YAbs == coordinate.YAbs);
 
-						coordinateShip.Ship = null;
+							coordinateShip.ShipId = null;
+
+							coordinateShip.Ship = null;
+
+							_coordinateShips.Update(coordinateShip);
+						}
 					}
 
 					return false;
 				}
 
+				if (!isOnlyCheck)
+				{
+					coordinateShip.ShipId = ship.Id;
 
-				coordinateShip.ShipId = ship.Id;
+					coordinateShip.Ship = ship;
 
-				coordinateShip.Ship = ship;
+					_coordinateShips.Update(coordinateShip);
+				}
 
-				coordinate += step;
+				coordinate += (to.Quadrant == coordinate.Quadrant) ? step : -step;
 			}
+			if (!isOnlyCheck)
+			{
+				ship.Rotation = targetRotation;
 
-			ship.Rotation = targetRotation;
+				ship.CenterCoordinateShipId = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																			&& cs.Quadrant == to.Quadrant
+																			&& cs.XAbs == to.XAbs
+																			&& cs.YAbs == to.YAbs).Id;
 
-			ship.CenterCoordinateShipId = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-																				&& cs.Coordinate == to).Id;
+				_entities.Update(ship);
+			}
 
 			return true;
 		}
+
 
 		public void Dislocate(Ship ship, int length, Board board, Coordinate from)
 		{
 			var step = Vector2D.Create(ship.Rotation);
 
-			from -= (length / 2) * step;
+			var coordinate = from - (length / 2) * step;
 
 			for (int i = length; i > 0; i--)
 			{
-				var cooridnateShip = _unitOfWork.CoordinateShips.FindFirst(cs => cs.BoardId == board.Id
-														 && cs.Coordinate == from);
+				var coordinateShip = _coordinateShips.FindFirst(cs => cs.BoardId == board.Id
+																   && cs.Quadrant == coordinate.Quadrant
+																   && cs.XAbs == coordinate.XAbs
+																   && cs.YAbs == coordinate.YAbs);
 
-				cooridnateShip.ShipId = 0;
+				coordinateShip.ShipId = null;
 
-				cooridnateShip.Ship = null;
+				coordinateShip.Ship = null;
 
-				from += step;
+				_coordinateShips.Update(coordinateShip);
+
+				coordinate += (from.Quadrant == coordinate.Quadrant) ? step : -step;
 			}
 		}
 
-		public void Dislocate(Ship ship, int length, Board board)
+		private void Dislocate(Ship ship, int length, Board board)
 		{
-			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+			var centralCoordinate = _coordinateShips.GetById(ship.CenterCoordinateShipId).GetCoordinate();
 
 			Dislocate(ship, length, board, centralCoordinate);
 		}
 
-		public void Dislocate(Ship ship)
+		private void Dislocate(Ship ship)
 		{
-			var size = _unitOfWork.Sizes.GetById(ship.SizeId);
-			var player = _unitOfWork.Players.GetById(ship.PlayerId);
-			var board = _unitOfWork.Boards.GetById(player.BoardId);
+			var size = _sizes.GetById(ship.SizeId);
+			var player = _players.GetById(ship.PlayerId);
+			var board = _boards.GetById(player.BoardId);
 
-			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+			var centralCoordinate = _coordinateShips.GetById(ship.CenterCoordinateShipId).GetCoordinate();
 
 			Dislocate(ship, size.Length, board, centralCoordinate);
 		}
 
+		public void Kill(Ship ship)
+		{
+			Dislocate(ship);
+
+			_entities.SaveChanges();
+		}
+
 		public bool Relocate(Ship ship, Coordinate to, Rotation targetRotation)
 		{
-			var size = _unitOfWork.Sizes.GetById(ship.SizeId);
-			var player = _unitOfWork.Players.GetById(ship.PlayerId);
-			var board = _unitOfWork.Boards.GetById(player.BoardId);
+			var size = _sizes.GetById(ship.SizeId);
+			var player = _players.GetById(ship.PlayerId);
+			var board = _boards.GetById(player.BoardId);
 
-			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+			var centralCoordinate = _coordinateShips.GetById(ship.CenterCoordinateShipId).GetCoordinate();
 
 			if (centralCoordinate.CalculateDistance(to) > size.Speed)
 			{
@@ -188,6 +243,8 @@ namespace SeaBattle.Application.Services
 				return false;
 			}
 
+			_entities.SaveChanges();
+
 			return true;
 		}
 
@@ -198,7 +255,7 @@ namespace SeaBattle.Application.Services
 
 		public bool Rotate(Ship ship, Rotation targetRotation)
 		{
-			var centralCoordinate = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+			var centralCoordinate = _coordinateShips.GetById(ship.CenterCoordinateShipId).GetCoordinate();
 
 			return Relocate(ship, centralCoordinate, targetRotation);
 		}
@@ -206,9 +263,11 @@ namespace SeaBattle.Application.Services
 		public int CalculateDistanceFromNearestPoint(Ship ship, Size shipSize, Coordinate to)
 		{
 
-			var from = _unitOfWork.CoordinateShips.GetById(ship.CenterCoordinateShipId).Coordinate;
+			var from = _coordinateShips.GetById(ship.CenterCoordinateShipId).GetCoordinate();
 
 			var step = Vector2D.Create(ship.Rotation);
+
+
 
 			from -= (shipSize.Length / 2) * step;
 
@@ -218,7 +277,7 @@ namespace SeaBattle.Application.Services
 			{
 				distanceMin = Math.Min(from.CalculateDistance(to), distanceMin);
 
-				from += step;
+				from += (to.Quadrant == from.Quadrant) ? step : -step;
 			}
 
 			return distanceMin;

@@ -1,16 +1,11 @@
-﻿using SeaBattle.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SeaBattle.Infrastructure.Serialization;
 
 namespace SeaBattle.Infrastructure.Interfaces
 {
-    public interface IDataHandler
-    {
-        public void SaveContext(IUnitOfWork unitOfWork);
+	public interface IDataHandler<TContext> where TContext : SerializationContext<TContext>
+	{
+		public void SaveContext(TContext context);
 
-        public IUnitOfWork Load();
-    }
+		public TContext Load();
+	}
 }

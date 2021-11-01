@@ -2,23 +2,26 @@
 using SeaBattle.Domain.Common;
 using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaBattle.Application.Services
 {
 	public class BoardService : BaseService<Board>, IBoardService
 	{
-		public BoardService(IUnitOfWork unitOfWork) : base(unitOfWork)
+
+		private readonly IRepository<CoordinateShip> _coordinateShips;
+		protected readonly IRepository<Ship> _ships;
+
+		public BoardService(IRepository<Board> boards, IRepository<CoordinateShip> coordinateShips, IRepository<Ship> ships) : base(boards)
 		{
+			_coordinateShips = coordinateShips;
+			_ships = ships;
 		}
 
 		public Board Create(int xAbsMax, int yAbsMax)
 		{
-			var board = _unitOfWork.Boards.Add(new Board(xAbsMax, yAbsMax));
+			var board = _entities.Add(new Board(xAbsMax, yAbsMax));
 
 			for (int q = 0; q < Board.Quadrants; q++)
 			{
@@ -27,15 +30,33 @@ namespace SeaBattle.Application.Services
 					for (int y = 0; y <= yAbsMax; y++)
 					{
 						var coordinateShip = new CoordinateShip(board.Id, new Coordinate(q, x, y));
-						_unitOfWork.CoordinateShips.Add(coordinateShip);
+
 						board.CoordinateShips.Add(coordinateShip);
 					}
 				}
 			}
 
-			_unitOfWork.Commit();
+			_coordinateShips.Add(board.CoordinateShips);
+
+			_entities.SaveChanges();
 
 			return board;
+		}
+
+		public string ToString(Board board)
+		{
+			board = _entities.FindFirst(b => b.Id == board.Id, nameof(Board) + "." + nameof(Board.CoordinateShips),
+															   nameof(CoordinateShip) + "." + nameof(CoordinateShip.Ship));
+
+			return board.ToString();
+		}
+
+		public Ship GetShipByIndexator(Board board, Coordinate coordinate)
+		{
+			board = _entities.FindFirst(b => b.Id == board.Id, nameof(Board) + "." + nameof(Board.Players),
+															   nameof(Board) + "." + nameof(Board.CoordinateShips),
+															   nameof(CoordinateShip) + "." + nameof(CoordinateShip.Ship));
+			return board[coordinate];
 		}
 	}
 }

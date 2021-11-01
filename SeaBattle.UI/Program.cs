@@ -1,24 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using SeaBattle.Application.Services;
 using SeaBattle.Application.Services.Interfaces;
 using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure;
-using SeaBattle.Infrastructure.Data;
-using SeaBattle.Infrastructure.Interfaces;
 using SeaBattle.Infrastructure.Repositories;
+using SeaBattle.Infrastructure.Serialization;
 using SeaBattle.UI.Configs;
-using Microsoft.Extensions.Configuration;
-using System;
-using Microsoft.Extensions.Options;
 using System.IO;
-using Microsoft.AspNetCore.Hosting;
 using System.Reflection;
 
 namespace SeaBattle.UI
 {
-    class Program
-    {
+	class Program
+	{
 
 		static void Main(string[] args)
 		{
@@ -31,7 +28,7 @@ namespace SeaBattle.UI
 
 			var SomePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-		
+
 
 			var host = Host.CreateDefaultBuilder()
 				.ConfigureServices((context, services) =>
@@ -41,23 +38,21 @@ namespace SeaBattle.UI
 					services.Configure<AppOptions>(Configuration.GetSection(nameof(AppOptions)));
 					services.AddSingleton<IAppOptions>(options => options.GetService<IOptions<AppOptions>>().Value);
 
-					services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-					services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-					services.AddScoped<IDataHandler, DataHandler>();
-
-					services.AddScoped<IUnitOfWork>(options =>
+					if (Configuration.GetValue<bool>("AppOptions:IsSerializable"))
 					{
-						var dataHandler = ((IDataHandler)options.GetService(typeof(IDataHandler)));
-						var unitOfWork = dataHandler.Load();
+						var jsonDataPath = Configuration.GetValue<string>("AppOptions:JsonDataPath");
+						services.AddSerializationContext<SeaBattleSerializationContext>(jsonDataPath);
+						services.AddScoped(typeof(IRepository<>), typeof(SerializationRepository<>));
+					}
+					else
+					{
+						services.AddScoped(typeof(IRepository<>), typeof(ORMRepository<>));
+						services.AddScoped<SeaBattleORMContext>();
+					}
 
-						if (unitOfWork is null)
-						{
-							unitOfWork = new UnitOfWork(dataHandler);
-						}
 
-						return unitOfWork;
-					});
+
+
 
 					services.AddScoped<IBoardService, BoardService>();
 					services.AddScoped<IPlayerService, PlayerService>();
@@ -66,9 +61,11 @@ namespace SeaBattle.UI
 					services.AddScoped<IBattleAbilityService, BattleAbilityService>();
 				}).Build();
 
-			
+
 
 			ActivatorUtilities.CreateInstance<Application>(host.Services).Run();
 		}
+
+
 	}
 }

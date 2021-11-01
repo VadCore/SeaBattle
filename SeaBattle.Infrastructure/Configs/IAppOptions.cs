@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SeaBattle.UI.Configs
+﻿namespace SeaBattle.UI.Configs
 {
-    public interface IAppOptions
-    {
-        public string JsonDataPath { get; }
-    }
+	public interface IAppOptions
+	{
+		public string JsonDataPath { get; }
+		public string DbConnectionString { get; }
+		public bool IsSerializable { get; }
+	}
 }
