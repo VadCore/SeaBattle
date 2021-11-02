@@ -1,4 +1,5 @@
 ﻿using SeaBattle.Domain.Entities;
+using SeaBattle.Domain.Enums;
 using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure.Serialization;
 using System.Collections.Generic;
@@ -8,6 +9,9 @@ namespace SeaBattle.Infrastructure
 {
 	public class SeaBattleSerializationContext : SerializationContext<SeaBattleSerializationContext>, IUnitOfWork
 	{
+
+		public SerializationSet<User> Users { get; set; }
+		public SerializationSet<Role> Roles { get; set; } = SeedRolesData();
 		public SerializationSet<Board> Boards { get; }
 		public SerializationSet<Player> Players { get; }
 		public SerializationSet<Ship> Ships { get; }
@@ -33,7 +37,23 @@ namespace SeaBattle.Infrastructure
 				new Size{ Id = 4, Title = "HugeShip", Length = 7, HealthMax = 10, Speed = 1, Reloading = 2, Range = 5, DamageShot = 5, HealShot = 3},
 			};
 
+			
+
 			return new SerializationSet<Size>(sizes);
+		}
+
+		public static SerializationSet<Role> SeedRolesData()
+		{
+			var roles = new HashSet<Role>
+			{
+				new Role(1, RoleType.Undefined),
+				new Role(2, RoleType.CommonUser),
+				new Role(3, RoleType.Admin),
+			};
+
+
+
+			return new SerializationSet<Role>(roles);
 		}
 	}
 }

@@ -71,5 +71,8 @@ namespace SeaBattle.Infrastructure.Repositories
 		{
 			_unitOfWork.Commit();
 		}
+
+
+
 	}
 }

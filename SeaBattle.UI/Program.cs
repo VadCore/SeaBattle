@@ -1,17 +1,19 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using SeaBattle.Application.Services;
 using SeaBattle.Application.Services.Interfaces;
+using SeaBattle.Domain.Entities;
 using SeaBattle.Domain.Interfaces;
 using SeaBattle.Infrastructure;
+using SeaBattle.Infrastructure.CustomIdentityProvider;
 using SeaBattle.Infrastructure.Repositories;
 using SeaBattle.Infrastructure.Serialization;
 using SeaBattle.UI.Configs;
 using System.IO;
 using System.Reflection;
-
 namespace SeaBattle.UI
 {
 	class Program
@@ -28,8 +30,6 @@ namespace SeaBattle.UI
 
 			var SomePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-
-
 			var host = Host.CreateDefaultBuilder()
 				.ConfigureServices((context, services) =>
 				{
@@ -37,6 +37,9 @@ namespace SeaBattle.UI
 
 					services.Configure<AppOptions>(Configuration.GetSection(nameof(AppOptions)));
 					services.AddSingleton<IAppOptions>(options => options.GetService<IOptions<AppOptions>>().Value);
+
+					services.AddScoped<IUserStore<User>, CustomUserStore>();
+					services.AddScoped<IRoleStore<Role>, CustomRoleStore>();
 
 					if (Configuration.GetValue<bool>("AppOptions:IsSerializable"))
 					{
@@ -51,9 +54,7 @@ namespace SeaBattle.UI
 					}
 
 
-
-
-
+					services.AddScoped<IUserService, UserService>();
 					services.AddScoped<IBoardService, BoardService>();
 					services.AddScoped<IPlayerService, PlayerService>();
 					services.AddScoped<IShipService, ShipService>();

@@ -1,5 +1,17 @@
 USE SeaBattleDB
 GO
+
+INSERT INTO Roles([Name], NormalizedName)
+	VALUES
+	('Undefined', 'UNDEFINED'),
+	('CommonUser', 'COMMONUSER'),
+	('Admin', 'ADMIN')
+
+INSERT INTO Users([Email], [Password], [RoleId], [Name], [NormalizedName])
+	VALUES
+	('firstuser@gmail.com', 'AQAAAAEAACcQAAAAEKLDQSDf33cPJEkArpgE0VyYYgqFdwVDYtynjaCoCdOZrI1t67vzSLABghz6y+TTQA==', 2, 'firstuser', 'FIRSTUSER'),
+	('seconduser@gmail.com', 'AQAAAAEAACcQAAAAEBBFmZ0Xg/gdjD3NQvngyjkmkcaRmQp77MSsZ89yBo1HWsetuk5IPPebonTnDDP03A==', 2, 'seconduser', 'SECONDUSER')
+
 INSERT INTO Boards(XAbsMax, YAbsMax, Turn, TurnPlayerId)
 	VALUES
 	(10, 10, 1, 1)
@@ -13,10 +25,10 @@ INSERT INTO CoordinateShips(BoardId, Quadrant, XAbs, YAbs, ShipId)
 	(1, 2, 3, 2, NULL),
 	(1, 2, 3, 3, NULL)
 
-INSERT INTO Players(BoardId, Nick, ActiveUnitsCount)
+INSERT INTO Players(BoardId, UserId, ActiveUnitsCount)
 	VALUES
-	(1, 'VASYA', 2),
-	(1, 'PETYA', 2)
+	(1, 1, 2),
+	(1, 2, 2)
 
 INSERT INTO Sizes(Title, [Length], HealthMax, Speed, [Range], Reloading, DamageShot, HealShot)
 	VALUES

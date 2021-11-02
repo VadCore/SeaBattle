@@ -1,4 +1,20 @@
 USE SeaBattleDB
+
+CREATE TABLE Roles(
+	[Id] int IDENTITY (1, 1) NOT NULL PRIMARY KEY,
+	[Name] nvarchar(40) NOT NULL,
+	[NormalizedName] nvarchar(40) NOT NULL
+)
+
+CREATE TABLE Users(
+	[Id] int IDENTITY (1, 1) NOT NULL PRIMARY KEY,
+	[Email] nvarchar(40) NOT NULL,
+	[Password] nvarchar(max) NOT NULL,
+	[RoleId] int NOT NULL FOREIGN KEY REFERENCES [Roles](Id),
+	[Name] nvarchar(40) NOT NULL,
+	[NormalizedName] nvarchar(40) NOT NULL,
+)
+
 CREATE TABLE Boards(
 	Id int IDENTITY (1,1) NOT NULL PRIMARY KEY,
 	XAbsMax int NOT NULL,
@@ -10,8 +26,8 @@ CREATE TABLE Boards(
 CREATE TABLE Players(
 	Id int IDENTITY (1,1) NOT NULL PRIMARY KEY,
 	BoardId int NOT NULL FOREIGN KEY REFERENCES [Boards](Id),
-	Nick nvarchar(30),
-	ActiveUnitsCount int NOT NULL
+	ActiveUnitsCount int NOT NULL,
+	UserId int NOT NULL FOREIGN KEY REFERENCES [Users](Id),
 )
 
 CREATE TABLE Sizes(

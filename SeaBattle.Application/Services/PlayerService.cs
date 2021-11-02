@@ -10,9 +10,9 @@ namespace SeaBattle.Application.Services
 		{
 		}
 
-		public Player Create(string nick, Board board)
+		public Player Create(User user, Board board)
 		{
-			var player = _entities.Add(new Player(nick, board.Id));
+			var player = _entities.Add(new Player(user, board.Id));
 
 			_entities.SaveChanges();
 

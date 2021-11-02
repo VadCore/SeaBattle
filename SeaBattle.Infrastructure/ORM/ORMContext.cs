@@ -26,13 +26,18 @@ namespace SeaBattle.Infrastructure.ORM
 		public IDictionary<string, Navigation> NavigationByTitles => navigationByTitles;
 		private static readonly IDictionary<string, Navigation> navigationByTitles = new Dictionary<string, Navigation>();
 
+
+		private static bool isConfiguredNavigations = false;
+
 		static ORMContext()
 		{
 			SetupPropertyInfos();
+			
 		}
 
 		public ORMContext(string connectionString)
 		{
+
 			_connectionString = connectionString;
 
 			Connection = new SqlConnection(_connectionString);
@@ -44,6 +49,12 @@ namespace SeaBattle.Infrastructure.ORM
 				var type = property.PropertyType.GetGenericArguments().FirstOrDefault();
 
 				property.SetValue(this, Activator.CreateInstance(property.PropertyType, new object[] { this, property.Name }));
+			}
+
+			if (!isConfiguredNavigations)
+			{
+				ConfigureNavigations();
+				isConfiguredNavigations = true;
 			}
 		}
 
@@ -74,6 +85,12 @@ namespace SeaBattle.Infrastructure.ORM
 			}
 		}
 
+		protected virtual void ConfigureNavigations()
+        {
+
+        }
+
+
 		public void Commit()
 		{
 			try
@@ -93,9 +110,9 @@ namespace SeaBattle.Infrastructure.ORM
 
 		public void Dispose()
 		{
-			transaction.Rollback();
-			transaction.Dispose();
-			Connection.Close();
+			transaction?.Rollback();
+			transaction?.Dispose();
+			Connection?.Close();
 		}
 	}
 }
